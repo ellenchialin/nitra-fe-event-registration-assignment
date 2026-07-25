@@ -18,19 +18,48 @@ not cosmetic.
 
 **Phased breakdown**, ordered so that pure logic is settled and testable before any layout work:
 
-| Phase | Scope                                                                                     | Est. |
-| ----- | ----------------------------------------------------------------------------------------- | ---- |
-| 0     | Environment (Node pin), Figma access, design recon                                        | 0.5h |
-| 1     | Foundation — `utils/` (time, currency, validators), `useRegistration` state, wizard shell | 1h   |
-| 2     | Step 1 — ticket cards, attendee form, `FormField`                                         | 1h   |
-| 3     | Step 2 — day tabs, session grid, capacity, conflict detection                             | 1h   |
-| 4     | Step 3 — category tabs, workshop conflicts, size/qty, shipping banner, order summary      | 1.5h |
-| 5     | Step 4 — review cards, unified validation, error navigation, submit + success             | 1h   |
-| 6     | Polish — interactive states, transitions, responsive, URL sync                            | 1h   |
-| 7     | i18n pass + this document                                                                 | 1h   |
+| Phase | Scope                                                                                | Est. | Status        |
+| ----- | ------------------------------------------------------------------------------------ | ---- | ------------- |
+| 0     | Environment (Node pin), Figma access, design recon                                   | 0.5h | ✅ Done       |
+| 1     | Foundation — `utils/` (time, currency, validators), `useRegistration` state          | 1h   | ✅ Done       |
+| 2     | Wizard shell + stepper, Step 1 — ticket cards, attendee form, `FormField`            | 1.5h | ▢ Not started |
+| 3     | Step 2 — day tabs, session grid, capacity bars, conflict detection                   | 1h   | ▢ Not started |
+| 4     | Step 3 — category tabs, workshop conflicts, size/qty, shipping banner, order summary | 1.5h | ▢ Not started |
+| 5     | Step 4 — review cards, unified validation, error navigation, submit + success        | 1h   | ▢ Not started |
+| 6     | Polish — interactive states, transitions, responsive, URL sync                       | 1h   | ▢ Not started |
+| 7     | i18n pass + this document                                                            | 1h   | ▢ Not started |
 
 Design fidelity is 20% of the rubric, so Phase 0 was deliberately front-loaded: guessing at spacing
 and then correcting it later is the most expensive way to lose those points.
+
+Progress is tracked as status here rather than as elapsed hours, and the log below cites the commits
+that delivered each phase — verifiable against `git log`, where a self-reported duration would not
+be.
+
+### Progress log
+
+**Phase 0 — Environment and design recon** ✅ `8a74e7e` `b2f4405`
+
+Pinned Node to 22.17.0 via `.nvmrc` to match the `engines` field. Unblocked the Figma MCP by
+duplicating the file (see §3) and pulled all 9 frames, the variable definitions, and layout
+metadata. The recon changed the plan materially — see §3 for the tab switchers, capacity bars, and
+token gaps it surfaced, none of which are in the README.
+
+**Phase 1 — Foundation** ✅ `bb03803` `46576f7` `69d772b` `28b7f47` `b394e27`
+
+Added ESLint + Prettier with JSDoc scoped to `src/utils` and `src/composables`; the rule was
+probe-tested rather than assumed active, since a silently inert lint rule is worse than none.
+Closed the two design-system gaps (radius scale, self-hosted Inter). Built the pure utilities and
+the shared state factory.
+
+Every claim in §2 was verified by executing the utilities against the real mock data rather than by
+inspection: the reachable-conflict set, the back-to-back and undated-add-on non-conflicts, and the
+formatted output matching the design's own rendered strings (`9:00 AM – 10:00 AM`,
+`Nov 16, 2:00 PM – 5:00 PM`, `$733.10`, `-$14.90`, `$670.00`).
+
+_Scope change:_ the wizard shell was planned for Phase 1 but moved into Phase 2. The shell hosts the
+stepper, the stepper needs per-step error badges, and those derive from `useValidation` — building
+a stub first would have meant rewriting it a phase later. Phase 2's estimate absorbs the move.
 
 ---
 

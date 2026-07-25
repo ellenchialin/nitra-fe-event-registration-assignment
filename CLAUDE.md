@@ -3,6 +3,10 @@
 Event Registration Wizard — Vue 3.5.17 + Quasar 2.18.5 + UnoCSS. Interview assignment.
 Narrative rationale lives in `PLAN.md`; this file is operational rules only.
 
+**Where the work stands: `PLAN.md` §1, phase table and progress log.** Update it when a phase
+completes — status and the delivering commits, not elapsed hours. Deliberately not mirrored here;
+duplicated progress goes stale on one side and then misleads.
+
 ## Commands
 
 ```bash
@@ -10,6 +14,8 @@ nvm use 22.17.0   # package.json pins this; do not develop on another major
 yarn dev          # http://localhost:9001 (note: not 9000, see quasar.config.js)
 yarn build
 ```
+
+Run `yarn lint && yarn format` before each commit.
 
 ## Source precedence
 
