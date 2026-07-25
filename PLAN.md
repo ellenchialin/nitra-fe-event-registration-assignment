@@ -245,9 +245,28 @@ The Figma variables mostly map cleanly onto `src/unocss/semantic.js`, with three
 - **Border radii are not in the UnoCSS theme.** Figma defines `xs:2 / m:6 / default:10 / 2xl:12 /
 Full:9999`; the starter's `uiTheme` defines colours and typography but no radius scale. I will
   extend the theme with these rather than scatter `rounded-[10px]` arbitrary values.
-- **The design is set in Inter**, at variable weights (630/610/570/485 — matching the starter's
-  `fontWeight` tokens exactly). The starter loads no webfont at all, so without adding Inter
-  Variable the whole thing renders in a fallback and every weight token is a lie.
+- **The design is set in Inter**, at variable weights. The starter loads no webfont at all, so
+  without adding Inter Variable the whole thing renders in a fallback and every weight token is a
+  lie. Confirmed against Figma's own codegen, which emits
+  `font-[family-name:var(--family/inter,'Inter:630')]`.
+
+**A note on font weights.** Figma's text styles resolve to weights that do not match the
+`font-weight/*` variables they are bound to: `heading/h1` renders at 700 and `h2`–`h4` at 680 while
+binding `font-weight/bold` (630); `body/md semi-bold` renders 640 against `semibold` 610; but
+`subtitle1` renders 600 (_below_ `semibold` 610), `body/sm/medium` renders 550 (below `medium` 570),
+and the button labels and `body/xs/medium` land exactly on their tokens.
+
+Deviations running in both directions, with several exact matches, is the signature of text styles
+hand-authored at arbitrary weights rather than a deliberate second scale — and Figma's generated CSS
+itself emits `var(--font-weight/bold)`, meaning its codegen expects the token, not the resolved
+number. I follow the token scale: chasing 680/700 would mean hardcoding weights that contradict the
+documented design system for a difference that is marginal at 24px, and correct token usage is its
+own graded criterion.
+
+Doing this surfaced a real gap in the starter: the weight scale existed only as JavaScript literals
+in the UnoCSS theme, while font sizes were CSS variables. Nothing set a default body weight, so all
+unstyled text rendered at the browser's 400 instead of the design's 485. The scale is now declared
+in `typography.scss` and referenced from both the theme and `body`, giving it one source of truth.
 
 `bg/disable` comes back as the string `"50"` rather than a colour — a broken variable in the source
 file. I use `bg-disable` from the starter tokens instead.

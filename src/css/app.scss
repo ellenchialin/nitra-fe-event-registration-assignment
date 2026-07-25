@@ -15,8 +15,15 @@
 body {
   background-color: var(--bg-surface-l0);
   color: var(--text-neutral-default);
+  // The design's body styles are all weight 485; without this, default text inherits the
+  // browser's 400 and every unstyled paragraph renders lighter than the design.
+  font-weight: var(--font-weight-regular);
+  // 'Inter Variable' is fontsource's name for the variable build of Inter — the same typeface
+  // the design specifies. Static 'Inter' follows it so a locally installed copy is used if the
+  // webfont fails, before falling back to the system stack.
   font-family:
     'Inter Variable',
+    'Inter',
     -apple-system,
     BlinkMacSystemFont,
     'Segoe UI',

@@ -8,10 +8,10 @@ export const fontSize = {
 }
 
 export const fontWeight = {
-  bold: '630',
-  semibold: '610',
-  medium: '570',
-  regular: '485',
+  bold: 'var(--font-weight-bold)',
+  semibold: 'var(--font-weight-semibold)',
+  medium: 'var(--font-weight-medium)',
+  regular: 'var(--font-weight-regular)',
 }
 
 export const lineHeight = {
@@ -44,7 +44,7 @@ export const borderRadius = {
  * Loaded via `@fontsource-variable/inter` in `src/boot/fonts.js`.
  */
 export const fontFamily = {
-  sans: "'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  sans: "'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
 }
 
 export const typographyShortcuts = [
