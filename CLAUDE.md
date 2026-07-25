@@ -39,7 +39,10 @@ specification.
 - **No user-facing string literals.** All copy goes through `vue-i18n` keys (`en`, `zh-TW`).
 - **JSDoc on every exported function** — params, return, and non-obvious behaviour.
 - Render all event copy from `src/mocks/event.js`. Never hardcode the event name (the design's
-  "WebDev Summit 2025" / "TechConf 2025" strings are stale; data says 2028).
+  "WebDev Summit 2025" / "TechConf 2025" strings are stale; data says 2028). The static
+  `<title>` in `index.html` is the deliberate exception — document metadata, not rendered copy,
+  and deriving it in JS would only trade duplication for a title flash. If a title ever needs to
+  vary by step or locale, use Quasar's Meta plugin rather than assigning `document.title`.
 
 ## Gotchas
 
