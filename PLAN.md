@@ -28,6 +28,7 @@ not cosmetic.
 | 5     | Step 4 — review cards, unified validation, error navigation, submit + success        | 1h   | ▢ Not started |
 | 6     | Polish — interactive states, transitions, responsive, URL sync                       | 1h   | ▢ Not started |
 | 7     | i18n pass + this document                                                            | 1h   | ▢ Not started |
+| 8     | Acceptance pass — scenarios below, clean-checkout smoke test                         | 0.5h | ▢ Not started |
 
 Design fidelity is 20% of the rubric, so Phase 0 was deliberately front-loaded: guessing at spacing
 and then correcting it later is the most expensive way to lose those points.
@@ -60,6 +61,79 @@ formatted output matching the design's own rendered strings (`9:00 AM – 10:00 
 _Scope change:_ the wizard shell was planned for Phase 1 but moved into Phase 2. The shell hosts the
 stepper, the stepper needs per-step error badges, and those derive from `useValidation` — building
 a stub first would have meant rewriting it a phase later. Phase 2's estimate absorbs the move.
+
+_Bug caught by verifying early:_ booting the dev server before writing any UI surfaced that the app
+was unreadable in dark mode. Nothing in the stack set a page background — Quasar applies
+`body--light` but no background colour, and the UnoCSS reset does not add one — so on a machine
+preferring dark, black text rendered on the user agent's dark canvas. Fixed by setting the body
+background and colour from tokens and declaring `color-scheme: light`, since the design has no dark
+variant and the token set defines light values only; the declaration also stops the browser
+dark-styling native inputs and scrollbars, which matters for a form-heavy UI. This would have been
+invisible to anyone developing in light mode and immediately obvious to a reviewer who is not.
+
+---
+
+## 1a. How this is verified
+
+"Ensure core functionality is working" is the assignment's first requirement, so verification is
+part of each phase rather than a pass at the end. Every phase closes by driving the running app in
+a browser — not by reading the diff and assuming — and comparing it side by side against the
+corresponding Figma frame. Bugs found one phase later are cheap; bugs found in Phase 8 are not.
+
+Test coverage is explicitly not evaluated, so this is a manual acceptance list rather than a suite.
+The scenarios are drawn from the actual mock data, using the reachable cases identified in §2 —
+testing `s2`&`s3` would prove nothing, since `s2` can never be selected.
+
+**Navigation and persistence**
+
+- N1 — Walk 1 → 2 → 3 → 4, then back to 1. Every field, ticket, session and add-on survives.
+- N2 — Jump between steps via the stepper, not just the footer buttons.
+- N3 — Browser Back moves a step rather than leaving the app (once URL sync lands, Phase 6).
+
+**Data rendering**
+
+- D1 — Sessions group into Nov 15 / Nov 16, six per day, in schedule order.
+- D2 — `s2` (120/120) and `s9` (90/90) render sold out and cannot be selected.
+- D3 — `ws2` (25/25) renders sold out — capacity applies to add-ons, which the README omits.
+- D4 — Capacity bars land in the right colour band; `s6` (41%) and `s5` (58%) differ visibly.
+- D5 — Times render in UTC: `s1` as `9:00 AM – 10:00 AM`, `ws1` as `Nov 16, 2:00 PM – 5:00 PM`.
+
+**Conflict detection**
+
+- C1 — `s4` + `s5` selected → conflict surfaces at submit, not before.
+- C2 — `s11` + `s12` selected → same.
+- C3 — `ws1` selected, then `s11` added on Step 2 → the retroactive conflict is flagged on Step 3
+  and the workshop is _not_ silently de-selected.
+- C4 — Back-to-back sessions (`s1` 09:00–10:00 with a 10:00 start) are never flagged.
+
+**Pricing**
+
+- P1 — VIP + `ws1` → `$599.00`, `$149.00`, `-$14.90`, total `$733.10` (the design's own figures).
+- P2 — VIP + t-shirt ×1 + stickers ×3 → `$670.00`, with no discount row rendered.
+- P3 — Switching VIP → General removes the discount line live.
+- P4 — Quantity clamps at `maxQuantity` (t-shirt 3, sleeve 1) and the summary tracks it.
+
+**Validation**
+
+- V1 — Submit with empty required fields → panel lists them prefixed `Step 1:`, the stepper node
+  turns into a red `!`, and clicking it lands on Step 1.
+- V2 — Merchandise selected + empty shipping address → required, with the three-state field
+  behaviour from the design.
+- V3 — Sized merchandise with no size chosen → blocked.
+- V4 — Invalid email and phone formats → blocked; `+1 (555) 123-4567` accepted.
+- V5 — No inline errors on Step 1 _before_ a submit attempt; live correction after one.
+
+**Submission and polish**
+
+- S1 — Valid submit → loading state, disabled button, then the success screen with a code.
+- S2 — "Back to Home" resets to a blank Step 1.
+- S3 — Locale switch translates copy, dates and currency.
+- S4 — Renders at mobile width without horizontal scroll.
+- S5 — Keyboard-only traversal of ticket cards, session cards and quantity pickers.
+
+**Release check** — fresh clone into a clean directory, `yarn && yarn dev`, confirm it boots with no
+manual steps. This is an explicit submission requirement and the failure mode (a file that works
+locally but was never committed) is invisible from inside the working tree.
 
 ---
 

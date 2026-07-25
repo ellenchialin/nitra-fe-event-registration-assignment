@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "wizard",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["dev"],
+      "port": 9001
+    }
+  ]
+}
