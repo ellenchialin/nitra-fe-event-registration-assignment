@@ -22,7 +22,7 @@ not cosmetic.
 | ----- | ------------------------------------------------------------------------------------ | ---- | ------------- |
 | 0     | Environment (Node pin), Figma access, design recon                                   | 0.5h | ✅ Done       |
 | 1     | Foundation — `utils/` (time, currency, validators), `useRegistration` state          | 1h   | ✅ Done       |
-| 2     | Wizard shell + stepper, Step 1 — ticket cards, attendee form, `FormField`            | 1.5h | ▢ Not started |
+| 2     | Wizard shell + stepper, Step 1 — ticket cards, attendee form, `FormField`            | 1.5h | ◐ In progress |
 | 3     | Step 2 — day tabs, session grid, capacity bars, conflict detection                   | 1h   | ▢ Not started |
 | 4     | Step 3 — category tabs, workshop conflicts, size/qty, shipping banner, order summary | 1.5h | ▢ Not started |
 | 5     | Step 4 — review cards, unified validation, error navigation, submit + success        | 1h   | ▢ Not started |
@@ -70,6 +70,39 @@ background and colour from tokens and declaring `color-scheme: light`, since the
 variant and the token set defines light values only; the declaration also stops the browser
 dark-styling native inputs and scrollbars, which matters for a form-heavy UI. This would have been
 invisible to anyone developing in light mode and immediately obvious to a reviewer who is not.
+
+**Phase 2 — Shell and Step 1** ◐ in progress
+
+The app header is built and measured against frame `1069:969`: height 73 (72 plus the 1px
+divider), logo at (48, 16) 40×40 on `bg-brand-emphasis-rest`, emblem 28×14.02 at (54, 28.99), title
+at (100, 24) in `heading/h4`. The "N" emblem is inlined as a component filled with `currentColor`
+rather than imported as an asset, so it takes colour from context and costs no extra request.
+
+The header renders `event.name` from the mock data rather than the design's literal string, which
+resolves the 2025/2028 conflict without a judgement call at the call site.
+
+_Two latent bugs in the starter, both found by measuring rather than looking._ The design's 8px logo
+radius is a literal in Figma too — `border-radius/*` defines 2/6/10/12/full with no 8 — so it stays
+exact rather than snapped to a token that would visibly change the mark.
+
+1. **No border would ever have rendered.** UnoCSS ships no Tailwind-style reset and the project
+   imports none, so `border-style` sits at its default of `none`, which forces computed border
+   width to 0 regardless of what `border-b` specifies. Every semantic `border-*` and `divider-*`
+   shortcut sets only a colour, so all of them were inert — while the generated CSS looked
+   perfectly correct, which is why reading the diff would never have caught it.
+
+   My first fix was wrong in an instructive way: prepending `border-solid` to the shortcuts set the
+   style on all four sides, and sides without an explicit width fall back to the initial `medium`,
+   so the header grew 1.5px borders on three sides it never asked for. The correct fix is the one
+   Tailwind's reset uses — pair `border-width: 0` with `border-style: solid` in a preflight, so a
+   border stays invisible until a width utility opts in. The `*` selector carries zero specificity,
+   so it supplies a default without overriding any Quasar component styling.
+
+2. **Stray typographic margins.** Quasar's base stylesheet gives `p` a `margin: 0 0 16px`, and with
+   no reset every heading and paragraph inherits margins the design does not have — it is built
+   entirely from auto-layout with explicit gaps. This alone put the header at 74.5px instead of 73.
+
+Both would have been near-invisible individually and compounding across every subsequent component.
 
 ---
 
