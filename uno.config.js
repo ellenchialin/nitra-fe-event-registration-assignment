@@ -28,6 +28,13 @@ export default defineConfig({
         return `:root {\n${body}\n}\n`
       },
     },
+    {
+      // No CSS reset is imported, so border-style defaults to `none` and forces computed
+      // border width to 0 — every semantic border-*/divider-* shortcut sets colour only and
+      // would render nothing. Width 0 must accompany style solid, or unspecified sides fall
+      // back to the initial `medium` width and draw unwanted borders.
+      getCSS: () => '*,::before,::after{border-width:0;border-style:solid;}',
+    },
   ],
   theme: uiTheme,
   extendTheme: [uiExtendTheme],

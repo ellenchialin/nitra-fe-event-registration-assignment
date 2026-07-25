@@ -1,26 +1,33 @@
 @import 'src/css/colors.scss';
 @import 'src/css/typography.scss';
 
-// The design has no dark variant and the token set defines light values only. Declaring the
-// scheme stops the browser from dark-styling native form controls, scrollbars and the default
-// canvas — without it, a reviewer in dark mode gets black text on the UA's dark background,
-// because nothing else in the stack sets a page background.
+// Light-only design; also stops the browser dark-styling native controls and scrollbars.
 :root {
   color-scheme: light;
 }
 
-// Quasar sets its own body font in its base stylesheet; this file is loaded afterwards, so
-// the design's Inter wins. The weight tokens (485/570/610/630) are only meaningful against a
-// variable font — without this the whole UI falls back and every weight collapses.
+// No CSS reset is imported, and Quasar's base gives p a 16px bottom margin. The design is
+// built from auto-layout, so spacing comes from flex/grid gap, never typographic margins.
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
 body {
   background-color: var(--bg-surface-l0);
   color: var(--text-neutral-default);
-  // The design's body styles are all weight 485; without this, default text inherits the
-  // browser's 400 and every unstyled paragraph renders lighter than the design.
   font-weight: var(--font-weight-regular);
-  // 'Inter Variable' is fontsource's name for the variable build of Inter — the same typeface
-  // the design specifies. Static 'Inter' follows it so a locally installed copy is used if the
-  // webfont fails, before falling back to the system stack.
+  // 'Inter Variable' is fontsource's name for Inter's variable build; static 'Inter' covers a
+  // locally installed copy if the webfont fails.
   font-family:
     'Inter Variable',
     'Inter',
