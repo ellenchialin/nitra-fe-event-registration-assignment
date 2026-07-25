@@ -16,13 +16,8 @@ function flattenToCssVars(obj, prefix = []) {
 }
 
 export default defineConfig({
-  presets: [
-    presetWind3(),
-    presetAttributify(),
-  ],
-  transformers: [
-    transformerDirectives(),
-  ],
+  presets: [presetWind3(), presetAttributify()],
+  transformers: [transformerDirectives()],
   preflights: [
     {
       getCSS: () => {

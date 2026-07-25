@@ -24,14 +24,18 @@ export const letterSpacing = {
   none: '0',
 }
 
-export const typographyShortcuts = [{
-  'text-h1': 'text-[length:var(--font-size-h1)] line-height-[var(--line-height-h1)] font-bold',
-  'text-h2': 'text-[length:var(--font-size-h2)] line-height-[var(--line-height-h2)] font-bold',
-  'text-h3': 'text-[length:var(--font-size-h3)] line-height-[var(--line-height-h3)] font-bold',
-  'text-h4': 'text-[length:var(--font-size-h4)] line-height-[var(--line-height-h4)] font-bold',
-  'text-subtitle1': 'text-[length:var(--font-size-subtitle1)] line-height-[var(--line-height-subtitle1)] font-semibold',
-  'text-subtitle2': 'text-[length:var(--font-size-subtitle2)] line-height-[var(--line-height-subtitle2)] font-semibold',
-}]
+export const typographyShortcuts = [
+  {
+    'text-h1': 'text-[length:var(--font-size-h1)] line-height-[var(--line-height-h1)] font-bold',
+    'text-h2': 'text-[length:var(--font-size-h2)] line-height-[var(--line-height-h2)] font-bold',
+    'text-h3': 'text-[length:var(--font-size-h3)] line-height-[var(--line-height-h3)] font-bold',
+    'text-h4': 'text-[length:var(--font-size-h4)] line-height-[var(--line-height-h4)] font-bold',
+    'text-subtitle1':
+      'text-[length:var(--font-size-subtitle1)] line-height-[var(--line-height-subtitle1)] font-semibold',
+    'text-subtitle2':
+      'text-[length:var(--font-size-subtitle2)] line-height-[var(--line-height-subtitle2)] font-semibold',
+  },
+]
 
 export const breakpoints = {
   tablet: '768px',
@@ -59,7 +63,4 @@ export const uiExtendTheme = (theme) => ({
   },
 })
 
-export const uiShortcuts = [
-  ...typographyShortcuts,
-  ...semanticShortcuts,
-]
+export const uiShortcuts = [...typographyShortcuts, ...semanticShortcuts]

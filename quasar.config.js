@@ -13,16 +13,14 @@ export default function () {
         browser: ['es2022', 'firefox115', 'chrome115', 'safari14'],
       },
       extendViteConf(viteConf) {
-        viteConf.plugins = viteConf.plugins || [];
-        viteConf.plugins.push(
-          ...UnoCSS(),
-        );
+        viteConf.plugins = viteConf.plugins || []
+        viteConf.plugins.push(...UnoCSS())
       },
     },
 
     devServer: {
       open: true,
-      port: 9001
+      port: 9001,
     },
 
     framework: {

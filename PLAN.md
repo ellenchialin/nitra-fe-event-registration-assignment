@@ -12,22 +12,22 @@ would do differently with more time.
 
 Before writing any code I did three things: read the starter repo end to end, read the two mock
 datasets closely enough to find their edge cases, and pull the Figma design through the Figma MCP
-server. The goal was to surface every ambiguity *before* implementation, because the expensive
+server. The goal was to surface every ambiguity _before_ implementation, because the expensive
 mistakes in a wizard like this are architectural (where state lives, how validation is modelled),
 not cosmetic.
 
 **Phased breakdown**, ordered so that pure logic is settled and testable before any layout work:
 
-| Phase | Scope | Est. |
-| --- | --- | --- |
-| 0 | Environment (Node pin), Figma access, design recon | 0.5h |
-| 1 | Foundation — `utils/` (time, currency, validators), `useRegistration` state, wizard shell | 1h |
-| 2 | Step 1 — ticket cards, attendee form, `FormField` | 1h |
-| 3 | Step 2 — day tabs, session grid, capacity, conflict detection | 1h |
-| 4 | Step 3 — category tabs, workshop conflicts, size/qty, shipping banner, order summary | 1.5h |
-| 5 | Step 4 — review cards, unified validation, error navigation, submit + success | 1h |
-| 6 | Polish — interactive states, transitions, responsive, URL sync | 1h |
-| 7 | i18n pass + this document | 1h |
+| Phase | Scope                                                                                     | Est. |
+| ----- | ----------------------------------------------------------------------------------------- | ---- |
+| 0     | Environment (Node pin), Figma access, design recon                                        | 0.5h |
+| 1     | Foundation — `utils/` (time, currency, validators), `useRegistration` state, wizard shell | 1h   |
+| 2     | Step 1 — ticket cards, attendee form, `FormField`                                         | 1h   |
+| 3     | Step 2 — day tabs, session grid, capacity, conflict detection                             | 1h   |
+| 4     | Step 3 — category tabs, workshop conflicts, size/qty, shipping banner, order summary      | 1.5h |
+| 5     | Step 4 — review cards, unified validation, error navigation, submit + success             | 1h   |
+| 6     | Polish — interactive states, transitions, responsive, URL sync                            | 1h   |
+| 7     | i18n pass + this document                                                                 | 1h   |
 
 Design fidelity is 20% of the rubric, so Phase 0 was deliberately front-loaded: guessing at spacing
 and then correcting it later is the most expensive way to lose those points.
@@ -54,8 +54,8 @@ never trigger.
 workshops carry `capacity`/`registered` as well, and `ws2` is full. The design confirms this — it
 renders "Sold Out" on that card. Handled for both.
 
-**Timezone.** Every timestamp is UTC (`Z`). In UTC+8 local time, `ws2` runs 23:30 → 02:30 *the next
-day*, so naive `Date#getDate()` grouping would file it under the wrong day and could produce
+**Timezone.** Every timestamp is UTC (`Z`). In UTC+8 local time, `ws2` runs 23:30 → 02:30 _the next
+day_, so naive `Date#getDate()` grouping would file it under the wrong day and could produce
 false negatives in overlap comparisons near midnight. **Decision: treat all times as UTC
 everywhere** — grouping, comparison, and display — via `Intl.DateTimeFormat(..., { timeZone: 'UTC' })`.
 
@@ -104,14 +104,14 @@ questions the README leaves open.
 
 5. **Error presentation is fully specified.** The errored step's stepper node turns into a red `!`
    circle with a red label; a danger-tinted panel lists errors prefixed by step (`Step 1: Phone
-   number is required`); the offending review card gets a danger border and its missing values
+number is required`); the offending review card gets a danger border and its missing values
    render as `— (required)` in danger text; and the submit button sits in a disabled state.
 
 6. **Shipping address has three distinct states**, given their own reference frame: optional
    (`Shipping Address (Optional)`, neutral border) → required-but-untouched (`Shipping Address *`,
    emphasised border) → required-and-empty (red label, red border, helper text). This is a clean
    way to reconcile the design with the README's "no inline validation on Step 1": the label and
-   border react live to merchandise selection, but the *error* styling only appears after a submit
+   border react live to merchandise selection, but the _error_ styling only appears after a submit
    attempt.
 
 ### Design ↔ spec conflicts, and how I resolved them
@@ -128,7 +128,7 @@ the design and the written spec disagree I followed the spec and recorded the di
   freely select any available sessions" with conflict validation "deferred to Step 4". I follow the
   README: conflicts never block selection, they surface at submit. I still need the greyed
   treatment, since that is the disabled style for at-capacity sessions.
-- **Sold-out card rendered as selected.** The same frame shows `s2` sold out *and* checked. Treated
+- **Sold-out card rendered as selected.** The same frame shows `s2` sold out _and_ checked. Treated
   as a mockup artefact; at-capacity sessions are disabled and unselectable.
 
 ### Token gaps found
@@ -140,7 +140,7 @@ The Figma variables mostly map cleanly onto `src/unocss/semantic.js`, with three
   in `colors.scss` is bound to brand teal, so reaching for Quasar's `color="primary"` on the CTA
   would produce the wrong button.
 - **Border radii are not in the UnoCSS theme.** Figma defines `xs:2 / m:6 / default:10 / 2xl:12 /
-  Full:9999`; the starter's `uiTheme` defines colours and typography but no radius scale. I will
+Full:9999`; the starter's `uiTheme` defines colours and typography but no radius scale. I will
   extend the theme with these rather than scatter `rounded-[10px]` arbitrary values.
 - **The design is set in Inter**, at variable weights (630/610/570/485 — matching the starter's
   `fontWeight` tokens exactly). The starter loads no webfont at all, so without adding Inter
@@ -190,14 +190,14 @@ not per line item, so the itemised breakdown always reconciles against the grand
 The starter ships Vue, Quasar, vue-router and UnoCSS. My default position was to add nothing and
 justify each exception.
 
-| Dependency | Verdict | Reasoning |
-| --- | --- | --- |
-| `vue-i18n` | **Added** | i18n is a listed nice-to-have. It only stays cheap if strings are keyed from the first commit; retrofitting an extraction pass across 15 components is where this turns into hours. Also routes date/currency formatting through one locale-aware layer instead of two. |
-| Inter Variable (self-hosted) | **Added** | The design is set in Inter at variable weights and the starter loads no font. Self-hosted rather than a Google Fonts CDN link so a clean checkout works offline and there is no render-blocking third-party request. |
-| `date-fns` / `dayjs` | **Rejected** | `Intl.DateTimeFormat` with `timeZone: 'UTC'` covers every formatting case here, and overlap detection is a two-line numeric comparison on epoch millis. A date library would add weight to avoid roughly 20 lines of standard-library code. |
-| `lodash-es` | **Rejected** | Grouping is a four-line `reduce`. Not worth a dependency. |
-| Pinia | **Rejected** | The rubric explicitly asks for composable or `provide`/`inject` state. A store library would sidestep the thing being assessed, for a single-screen wizard that never needs cross-route persistence. |
-| `vitest` | **Considered** | Test coverage is explicitly not evaluated. If time allows I would add a small suite over `rangesOverlap` and the pricing reducer — the two functions where an off-by-one is both plausible and invisible in the UI. |
+| Dependency                   | Verdict        | Reasoning                                                                                                                                                                                                                                                               |
+| ---------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `vue-i18n`                   | **Added**      | i18n is a listed nice-to-have. It only stays cheap if strings are keyed from the first commit; retrofitting an extraction pass across 15 components is where this turns into hours. Also routes date/currency formatting through one locale-aware layer instead of two. |
+| Inter Variable (self-hosted) | **Added**      | The design is set in Inter at variable weights and the starter loads no font. Self-hosted rather than a Google Fonts CDN link so a clean checkout works offline and there is no render-blocking third-party request.                                                    |
+| `date-fns` / `dayjs`         | **Rejected**   | `Intl.DateTimeFormat` with `timeZone: 'UTC'` covers every formatting case here, and overlap detection is a two-line numeric comparison on epoch millis. A date library would add weight to avoid roughly 20 lines of standard-library code.                             |
+| `lodash-es`                  | **Rejected**   | Grouping is a four-line `reduce`. Not worth a dependency.                                                                                                                                                                                                               |
+| Pinia                        | **Rejected**   | The rubric explicitly asks for composable or `provide`/`inject` state. A store library would sidestep the thing being assessed, for a single-screen wizard that never needs cross-route persistence.                                                                    |
+| `vitest`                     | **Considered** | Test coverage is explicitly not evaluated. If time allows I would add a small suite over `rangesOverlap` and the pricing reducer — the two functions where an off-by-one is both plausible and invisible in the UI.                                                     |
 
 ---
 
@@ -209,32 +209,32 @@ correcting.
 
 **What worked well**
 
-- *Data reconnaissance.* Asking it to verify the overlap comment in `sessions.js` against the actual
+- _Data reconnaissance._ Asking it to verify the overlap comment in `sessions.js` against the actual
   timestamps — instead of trusting the comment — surfaced that half the documented conflict pairs
   are unreachable because the sessions are at capacity. That reframed which cases were worth
   building a demo around.
-- *Design recon at volume.* Pulling 9 frames plus the variable definitions and cross-checking them
+- _Design recon at volume._ Pulling 9 frames plus the variable definitions and cross-checking them
   against `semantic.js` found the orange-CTA mismatch, the missing radius scale, and the missing
   webfont in one pass. Reading the token-reference frame by eye would have taken far longer and
   probably missed the `--q-primary` trap.
-- *Naming the timezone risk before it bit.* The UTC-vs-local boundary problem with `ws2` was flagged
+- _Naming the timezone risk before it bit._ The UTC-vs-local boundary problem with `ws2` was flagged
   during planning rather than discovered as a mysterious grouping bug at 11pm.
 
 **Where it fell short, and what I did about it**
 
-- *It defaulted to the conventional answer on URL sync.* Asked whether to sync the wizard step to the
+- _It defaulted to the conventional answer on URL sync._ Asked whether to sync the wizard step to the
   URL, it initially said no — reasonable-sounding, and wrong. When I pushed for the senior-engineer
   reasoning it reconsidered and identified the actual stake: on a single route, the browser Back
   button silently discards the entire form. It also caught the failure mode most implementations
   hit, where `router.replace` produces a correct-looking URL and a Back button that still exits the
   app. The reversal only happened because I asked it to justify the recommendation rather than
   accepting the first answer.
-- *It over-trusted the mockup as specification.* Early reads treated the Step 2 frame as
+- _It over-trusted the mockup as specification._ Early reads treated the Step 2 frame as
   authoritative, which would have meant blocking conflicting sessions — directly contrary to the
   README. The frame is internally inconsistent (one conflicting session greyed, another not; a
   sold-out card rendered as selected). Resolving design-vs-spec conflicts needed the documented
   precedence order applied by hand; the model had no way to know which artefact wins.
-- *It initially proposed stacked day/category sections* for Steps 2 and 3, reading only the README's
+- _It initially proposed stacked day/category sections_ for Steps 2 and 3, reading only the README's
   "group by". The design says tabs. A plan built from written specs alone would have produced the
   wrong components for two of the four steps — the argument for doing design recon before
   implementation rather than after.

@@ -70,16 +70,16 @@ placeholders all derive from it — never maintain those separately. Errors are 
 Figma file key `E60tE1WSZbpG4m8dO4qvfG` (duplicate — the original grants view access only, which the
 MCP server rejects). Frame node IDs:
 
-| Frame | Node |
-| --- | --- |
-| Step 1 — Attendee Info | `1069:968` |
-| Step 2 — Session Selection | `1072:912` |
-| Step 3 — Add-ons | `1073:899` |
+| Frame                          | Node       |
+| ------------------------------ | ---------- |
+| Step 1 — Attendee Info         | `1069:968` |
+| Step 2 — Session Selection     | `1072:912` |
+| Step 3 — Add-ons               | `1073:899` |
 | Step 3 — Add-ons (Merchandise) | `1149:565` |
-| Step 4 — Review & Submit | `1074:897` |
-| Success State | `1075:903` |
-| Validation Error State | `1076:904` |
-| Design Token Reference | `1077:896` |
-| Shipping Address — States | `1203:587` |
+| Step 4 — Review & Submit       | `1074:897` |
+| Success State                  | `1075:903` |
+| Validation Error State         | `1076:904` |
+| Design Token Reference         | `1077:896` |
+| Shipping Address — States      | `1203:587` |
 
 Load the `figma:figma-implement-design` skill before calling `get_design_context`.
