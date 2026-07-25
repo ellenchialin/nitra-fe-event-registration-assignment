@@ -1,0 +1,8 @@
+node_modules
+dist
+.quasar
+.yarn
+yarn.lock
+
+# The assignment brief as delivered — not ours to restyle.
+README.md
