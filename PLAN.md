@@ -250,6 +250,23 @@ number is required`); the offending review card gets a danger border and its mis
    border react live to merchandise selection, but the _error_ styling only appears after a submit
    attempt.
 
+### One deliberate addition to the design
+
+The header carries a locale switcher that appears in no frame. The design documents the four
+steps plus success, error, token and shipping-state references, but never depicts i18n — it is
+silent on the feature rather than opposed to it, while the assignment doc lists i18n as a
+nice-to-have, and the doc outranks the mockup.
+
+The practical argument is the stronger one: without a switcher the `zh-TW` translations are
+unreachable from the UI, and a reviewer would have to open a console to discover the feature
+exists at all.
+
+It is scoped so nothing designed moves: all header content in the design is left-aligned (logo at
+x=48, title at x=100), so the switcher sits `ml-auto` with its right edge at 1392 — exactly the
+header's 48px padding. It uses only existing tokens (`border-neutral-muted`, `bg-surface-l0`,
+`text-neutral-muted`, `rounded-m`) and a native `<select>`, so it inherits correct keyboard and
+screen-reader behaviour rather than reimplementing a dropdown.
+
 ### Design ↔ spec conflicts, and how I resolved them
 
 The assignment states the official doc wins over the repo README, and both outrank a mockup. Where

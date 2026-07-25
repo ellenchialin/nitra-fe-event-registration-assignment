@@ -15,6 +15,7 @@ export default {
     submit: '送出報名',
   },
   a11y: {
+    language: '語言',
     progress: '報名進度',
     stepOf: '第 {number} 步，共 {total} 步：{label}',
     stepCompleted: '已完成',

@@ -34,6 +34,15 @@ button {
   cursor: pointer;
 }
 
+// Form controls do not inherit typography from body by default, so they fall back to the
+// user agent's font instead of Inter.
+input,
+select,
+textarea {
+  color: inherit;
+  font: inherit;
+}
+
 body {
   background-color: var(--bg-surface-l0);
   color: var(--text-neutral-default);

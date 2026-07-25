@@ -1,6 +1,7 @@
 <script setup>
 import { event } from '../mocks/event.js'
 import BrandMark from './ui/BrandMark.vue'
+import LocaleSwitcher from './ui/LocaleSwitcher.vue'
 </script>
 
 <template>
@@ -13,5 +14,9 @@ import BrandMark from './ui/BrandMark.vue'
     </div>
 
     <p class="text-h4 text-neutral">{{ event.name }}</p>
+
+    <!-- Not in the design, which does not cover i18n at all. Without it the translations are
+         unreachable from the UI. Placed right so the design's left portion is untouched. -->
+    <LocaleSwitcher class="ml-auto" />
   </header>
 </template>

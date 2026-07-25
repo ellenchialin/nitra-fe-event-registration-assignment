@@ -15,6 +15,7 @@ export default {
     submit: 'Submit Registration',
   },
   a11y: {
+    language: 'Language',
     progress: 'Registration progress',
     stepOf: 'Step {number} of {total}: {label}',
     stepCompleted: 'completed',
