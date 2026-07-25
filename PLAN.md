@@ -22,7 +22,7 @@ not cosmetic.
 | ----- | ------------------------------------------------------------------------------------ | ---- | ------------- |
 | 0     | Environment (Node pin), Figma access, design recon                                   | 0.5h | ✅ Done       |
 | 1     | Foundation — `utils/` (time, currency, validators), `useRegistration` state          | 1h   | ✅ Done       |
-| 2     | Wizard shell + stepper, Step 1 — ticket cards, attendee form, `FormField`            | 1.5h | ◐ In progress |
+| 2     | Wizard shell + stepper, Step 1 — ticket cards, attendee form, `FormField`            | 1.5h | ✅ Done       |
 | 3     | Step 2 — day tabs, session grid, capacity bars, conflict detection                   | 1h   | ▢ Not started |
 | 4     | Step 3 — category tabs, workshop conflicts, size/qty, shipping banner, order summary | 1.5h | ▢ Not started |
 | 5     | Step 4 — review cards, unified validation, error navigation, submit + success        | 1h   | ▢ Not started |
@@ -71,7 +71,7 @@ variant and the token set defines light values only; the declaration also stops 
 dark-styling native inputs and scrollbars, which matters for a form-heavy UI. This would have been
 invisible to anyone developing in light mode and immediately obvious to a reviewer who is not.
 
-**Phase 2 — Shell and Step 1** ◐ in progress
+**Phase 2 — Shell and Step 1** ✅ `8f6400c` `2ca6842` `2682696` `d7e9870` `6da5c0b`
 
 The app header is built and measured against frame `1069:969`: height 73 (72 plus the 1px
 divider), logo at (48, 16) 40×40 on `bg-brand-emphasis-rest`, emblem 28×14.02 at (54, 28.99), title
@@ -103,6 +103,18 @@ exact rather than snapped to a token that would visibly change the mark.
    entirely from auto-layout with explicit gaps. This alone put the header at 74.5px instead of 73.
 
 Both would have been near-invisible individually and compounding across every subsequent component.
+
+_Sticky chrome._ The stepper pins to the top and the action bar to the bottom, so the forward
+action stays reachable on the long steps and free navigation stays available while scrolling. The
+design cannot settle this — its frames run 981px to 1309px tall, so scrolling is clearly expected,
+but a static frame says nothing about sticky behaviour.
+
+Implemented with `position: sticky` on the normal document scroll rather than an inner
+`overflow-y: auto` region. A nested scroll container breaks find-in-page, makes `scrollIntoView`
+unreliable — which Phase 5 needs to reach the first validation error — and creates the "scrolled the
+wrong thing" problem, with noticeably worse momentum scrolling on iOS. The header is deliberately
+left to scroll away: pinning it too would cost 153px of permanent chrome, 17% of a 900px viewport
+before the action bar's 72px, and it carries only branding and the locale switcher.
 
 ---
 

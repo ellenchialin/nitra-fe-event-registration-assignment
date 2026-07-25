@@ -17,7 +17,7 @@ const { steps, currentStep, isFirstStep, isLastStep, advanceLabelKey, goNext, go
   <div class="flex min-h-screen flex-col bg-surface-l0">
     <AppHeader />
 
-    <div class="border-b divider-default px-6">
+    <div class="sticky top-0 z-10 border-b divider-default bg-surface-l0 px-6">
       <WizardStepper :steps="steps" class="content-column" @select="goToStep" />
     </div>
 
@@ -29,7 +29,7 @@ const { steps, currentStep, isFirstStep, isLastStep, advanceLabelKey, goNext, go
       </div>
     </main>
 
-    <div class="border-t divider-default bg-surface-l0 px-6">
+    <div class="sticky bottom-0 z-10 border-t divider-default bg-surface-l0 px-6">
       <div
         class="content-column flex items-center py-4"
         :class="isFirstStep ? 'justify-end' : 'justify-between'"
