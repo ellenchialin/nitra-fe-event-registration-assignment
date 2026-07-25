@@ -1,16 +1,11 @@
 /**
- * Time helpers for the registration wizard.
- *
- * Every timestamp in the mock data is UTC (`...Z`) and is treated as UTC throughout —
- * grouping, comparison and display. This is deliberate: `ws2` runs 15:30–18:30 UTC, which
- * in UTC+8 falls on 23:30–02:30 *the next local day*. Grouping on local calendar fields
- * would file it under the wrong day and could miss overlaps that straddle local midnight.
- * The design confirms UTC is intended — it labels `ws2` "Nov 15, 3:30 PM – 6:30 PM".
+ * Time helpers. Every mock timestamp is UTC and is treated as UTC throughout — grouping,
+ * comparison and display. Local-time grouping would file `ws2` (15:30–18:30Z) under the wrong
+ * day in UTC+8, where it runs 23:30–02:30 the next day.
  */
 
 const UTC = 'UTC'
 
-/** En dash with hair spacing, matching the time ranges in the design. */
 const RANGE_SEPARATOR = ' – '
 
 /**
@@ -27,10 +22,8 @@ export function toEpochMs(isoTimestamp) {
 /**
  * Determines whether two time ranges overlap.
  *
- * Ranges are treated as half-open (`[start, end)`), so a range ending exactly when another
- * begins is *not* a conflict — back-to-back sessions are legitimately attendable. Any range
- * with a missing or unparseable bound is treated as non-conflicting, which is what lets
- * undated add-ons (meals, merchandise) flow through the same comparison safely.
+ * Half-open (`[start, end)`), so back-to-back ranges are not a conflict. Ranges with missing
+ * or unparseable bounds return `false`, letting undated add-ons use the same comparison.
  *
  * @param {string} startA - ISO start of the first range.
  * @param {string} endA - ISO end of the first range.
@@ -52,8 +45,7 @@ export function rangesOverlap(startA, endA, startB, endB) {
 /**
  * Determines whether two scheduled records overlap in time.
  *
- * Accepts the `{ date, endDate }` shape used by both `sessions.js` and `addons.js`, so
- * sessions and workshops can be compared against each other directly.
+ * Takes the `{ date, endDate }` shape shared by `sessions.js` and `addons.js`.
  *
  * @param {{date?: string, endDate?: string}} a - First scheduled record.
  * @param {{date?: string, endDate?: string}} b - Second scheduled record.
@@ -142,8 +134,7 @@ export function formatDayAndTime(isoTimestamp, locale = 'en-US') {
 /**
  * Formats a start/end pair as a day and time range, e.g. `'Nov 16, 2:00 PM – 5:00 PM'`.
  *
- * Used by the add-on cards, where a workshop's day is not implied by a surrounding day group
- * the way a session's is.
+ * Used by add-on cards, where no surrounding day group implies the date.
  *
  * @param {string} startIso - ISO start timestamp.
  * @param {string} endIso - ISO end timestamp.
@@ -160,8 +151,7 @@ export function formatDayAndTimeRange(startIso, endIso, locale = 'en-US') {
 /**
  * Groups scheduled records into UTC calendar days, ordered chronologically.
  *
- * Records without a parseable `date` are omitted rather than collected under an empty key,
- * so undated add-ons cannot create a phantom day group. Records within each day are sorted
+ * Undated records are omitted rather than grouped under an empty key, and each day is sorted
  * by start time so render order does not depend on source-array order.
  *
  * @param {Array<{date?: string}>} records - Records carrying an ISO `date` field.

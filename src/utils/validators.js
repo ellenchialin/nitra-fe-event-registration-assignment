@@ -1,20 +1,12 @@
 /**
- * Field-level predicates used by the unified validation rule set.
- *
- * Each predicate is total: it accepts anything and returns a boolean, so rules never need
- * to guard against `undefined` before calling one.
+ * Field-level predicates for the validation rule set. Each accepts anything and returns a
+ * boolean, so rules never guard against `undefined` first.
  */
 
-/**
- * Matches the practical shape of an email address: non-empty local part, single `@`,
- * dotted domain with a two-or-more character TLD.
- *
- * Deliberately not RFC 5322 — a fully compliant pattern is unreadable, rejects nothing
- * users actually type, and the authoritative check for an address is always delivery.
- */
+// Practical shape, not RFC 5322: a compliant pattern is unreadable and the authoritative
+// check for an address is always delivery.
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)+$/
 
-/** Digits, with optional separators, spaces, parentheses and a leading `+`. */
 const PHONE_ALLOWED_CHARS = /^[+\d\s().-]+$/
 
 const PHONE_MIN_DIGITS = 7
@@ -44,9 +36,8 @@ export function isValidEmail(value) {
 /**
  * Checks that a value looks like a usable phone number.
  *
- * Accepts international formats by counting digits rather than matching a national pattern:
- * separators are permitted anywhere, and the digit count must fall within the E.164 range
- * of 7–15. This accepts the design's `+1 (555) 123-4567` without rejecting non-US numbers.
+ * Counts digits against the E.164 range (7–15) rather than matching a national pattern, so
+ * `+1 (555) 123-4567` passes without rejecting non-US numbers.
  *
  * @param {unknown} value - Value to test.
  * @returns {boolean} `true` when the value resembles a phone number.

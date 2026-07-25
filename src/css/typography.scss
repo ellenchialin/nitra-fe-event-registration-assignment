@@ -19,8 +19,7 @@
   --line-height-md: 20px;
   --line-height-sm: 16px;
 
-  /* Variable-font weight axis, mirroring Figma's font-weight/* variables. Declared here so
-     the scale has one source of truth shared by the UnoCSS theme and plain CSS. */
+  /* Weight axis from Figma's font-weight/* variables, shared by the UnoCSS theme and CSS. */
   --font-weight-bold: 630;
   --font-weight-semibold: 610;
   --font-weight-medium: 570;

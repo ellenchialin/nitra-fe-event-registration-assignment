@@ -2,13 +2,7 @@ import { computed, inject, provide, reactive, ref } from 'vue'
 import { addons } from '../mocks/addons.js'
 import { sessions } from '../mocks/sessions.js'
 
-/**
- * Injection key for the wizard's shared registration state.
- *
- * A Symbol rather than a string so nothing can collide with or accidentally read this state,
- * and a provide/inject pair rather than a module-level singleton so ownership is explicit and
- * the state resets cleanly with the component that owns it.
- */
+/** Injection key for the wizard's shared registration state. */
 export const REGISTRATION_KEY = Symbol('registration')
 
 /** Add-on categories, matching the `category` field in `addons.js`. */
@@ -48,14 +42,9 @@ function createEmptyAttendee() {
 /**
  * Creates the wizard's shared reactive state.
  *
- * Selections are stored as identifiers only; every richer view of them (grouped sessions,
- * conflicts, pricing, validation) is derived downstream so there is exactly one source of
- * truth and no synchronisation to keep correct.
- *
- * Add-ons use a single `{ quantity, size }` shape across all three categories. Workshops and
- * meals are quantity 0 or 1; merchandise carries a real quantity and an optional size. One
- * shape means pricing and validation iterate a single collection rather than special-casing
- * per category.
+ * Selections are stored as identifiers only; grouped sessions, conflicts, pricing and
+ * validation all derive downstream. Add-ons share one `{ quantity, size }` shape across all
+ * three categories so pricing and validation iterate a single collection.
  *
  * @returns {object} The registration state, its mutations, and core derived selections.
  */
@@ -111,11 +100,9 @@ export function createRegistrationState() {
   }
 
   /**
-   * Sets an add-on's quantity, clamped to `[0, maxQuantity]`.
+   * Sets an add-on's quantity, clamped to `[0, maxQuantity]` (1 when unspecified).
    *
-   * Reaching zero removes the record entirely rather than leaving a zero-quantity entry, so
-   * downstream consumers can treat presence as selection. An add-on without `maxQuantity`
-   * (workshops, meals) is capped at 1.
+   * Zero deletes the record, so presence means selection.
    *
    * @param {string} addonId - Add-on identifier.
    * @param {number} quantity - Requested quantity before clamping.
@@ -151,8 +138,7 @@ export function createRegistrationState() {
   /**
    * Records the chosen size for a sized merchandise item.
    *
-   * Stored even when quantity is zero so a size picked before the quantity is raised is not
-   * silently discarded.
+   * Stored even at quantity zero, so a size chosen before the quantity is raised survives.
    *
    * @param {string} addonId - Add-on identifier.
    * @param {string|null} size - Chosen size, or `null` to clear it.
@@ -242,9 +228,7 @@ export function createRegistrationState() {
 }
 
 /**
- * Creates the registration state and provides it to descendants.
- *
- * Called once, by the wizard root.
+ * Creates the registration state and provides it to descendants. Called once, by the wizard root.
  *
  * @returns {ReturnType<typeof createRegistrationState>} The state, for the provider's own use.
  */
@@ -257,9 +241,7 @@ export function provideRegistration() {
 /**
  * Injects the shared registration state.
  *
- * Throws rather than returning `undefined` when called outside the wizard: a missing provider
- * is a wiring mistake, and failing at the injection point names the problem far better than a
- * downstream `Cannot read properties of undefined`.
+ * Throws rather than returning `undefined`, so a missing provider fails where it is diagnosable.
  *
  * @returns {ReturnType<typeof createRegistrationState>} The shared state.
  * @throws {Error} When no provider is present in the component's ancestry.

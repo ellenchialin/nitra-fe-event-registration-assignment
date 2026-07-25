@@ -1,10 +1,7 @@
 /**
- * Currency helpers.
- *
- * All pricing arithmetic runs in integer cents and converts to a formatted string only at
- * the display boundary. The VIP workshop discount is 10%, so a float pipeline would produce
- * values like `14.900000000000002` and risk a grand total that disagrees with the sum of its
- * own line items — visible here because the same total renders in three places at once.
+ * Currency helpers. Pricing runs in integer cents and formats only at the display boundary —
+ * the 10% VIP discount in floats yields 14.900000000000002 and risks a grand total that
+ * disagrees with the sum of its own line items.
  */
 
 const CENTS_PER_UNIT = 100
@@ -23,8 +20,7 @@ export function toCents(amount) {
 /**
  * Applies a percentage discount to a cent amount, rounding to the nearest cent.
  *
- * Rounds once on the supplied total rather than per line item, so an itemised breakdown
- * always reconciles against the grand total.
+ * Rounds once on the total rather than per line item, so a breakdown always reconciles.
  *
  * @param {number} cents - Amount to discount, in whole cents.
  * @param {number} percent - Discount percentage, e.g. `10` for 10%.
