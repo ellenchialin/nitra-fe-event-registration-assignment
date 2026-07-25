@@ -24,6 +24,29 @@ export const letterSpacing = {
   none: '0',
 }
 
+/**
+ * Radius scale from the Figma design system (`border-radius/*`).
+ *
+ * These intentionally override the preset's defaults for `DEFAULT` and `2xl` so that a bare
+ * `rounded` matches the design's 10px controls rather than the preset's 4px. Anything that
+ * needs a radius should use a key from this scale rather than an arbitrary `rounded-[Npx]`.
+ */
+export const borderRadius = {
+  xs: '2px',
+  m: '6px',
+  DEFAULT: '10px',
+  '2xl': '12px',
+  full: '9999px',
+}
+
+/**
+ * The design is set in Inter at variable weights matching the `fontWeight` scale above.
+ * Loaded via `@fontsource-variable/inter` in `src/boot/fonts.js`.
+ */
+export const fontFamily = {
+  sans: "'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+}
+
 export const typographyShortcuts = [
   {
     'text-h1': 'text-[length:var(--font-size-h1)] line-height-[var(--line-height-h1)] font-bold',
@@ -45,9 +68,11 @@ export const breakpoints = {
 export const uiTheme = {
   colors,
   fontSize,
+  fontFamily,
   fontWeight,
   lineHeight,
   letterSpacing,
+  borderRadius,
   zIndex: {
     banner: '1000',
     'banner-alert': '1001',
