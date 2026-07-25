@@ -22,6 +22,18 @@ dd {
   margin: 0;
 }
 
+// Without a reset, buttons keep their user-agent chrome — a grey face, 1px 6px padding and a
+// separate font stack — which fights every styled control. Quasar's own components style
+// themselves by class, so they override this.
+button {
+  appearance: none;
+  background: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
 body {
   background-color: var(--bg-surface-l0);
   color: var(--text-neutral-default);

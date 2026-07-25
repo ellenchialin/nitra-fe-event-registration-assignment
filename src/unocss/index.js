@@ -34,6 +34,12 @@ export const borderRadius = {
   full: '9999px',
 }
 
+// The stepper, step content and action bar all sit in a 1200px column (x=120 at the design's
+// 1440 frame). Expressed as a max-width rather than fixed padding so it stays 1200 above 1440.
+export const maxWidth = {
+  content: '1200px',
+}
+
 // Loaded via @fontsource-variable/inter in src/boot/fonts.js.
 export const fontFamily = {
   sans: "'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -65,6 +71,7 @@ export const uiTheme = {
   lineHeight,
   letterSpacing,
   borderRadius,
+  maxWidth,
   zIndex: {
     banner: '1000',
     'banner-alert': '1001',

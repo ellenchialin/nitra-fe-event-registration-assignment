@@ -38,5 +38,13 @@ export default defineConfig({
   ],
   theme: uiTheme,
   extendTheme: [uiExtendTheme],
-  shortcuts: uiShortcuts,
+  shortcuts: [
+    ...uiShortcuts,
+    {
+      // The 1200px column shared by the stepper, step content and action bar. Sits inside a
+      // horizontally padded band, so the padding applies only once the viewport drops below
+      // the column width rather than eating into it.
+      'content-column': 'mx-auto w-full max-w-content',
+    },
+  ],
 })
