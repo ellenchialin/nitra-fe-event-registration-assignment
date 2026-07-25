@@ -250,6 +250,19 @@ number is required`); the offending review card gets a danger border and its mis
    border react live to merchandise selection, but the _error_ styling only appears after a submit
    attempt.
 
+### Figma tokens must be translated by value, not by name
+
+The most costly trap so far. Figma's generated CSS names a token for every colour, and the
+starter defines tokens with the same names — but the brand ramp is shifted one step between
+them. Figma's `bg/brand/muted/rest` is `#EEF6F7`; the starter's `--bg-brand-muted-rest` is
+`#CBE5E6`, and `#EEF6F7` lives in `bg-brand-subtle-rest`. `text/brand/default` and
+`text/brand/emphasis` disagree the same way.
+
+Copying the token name out of Figma's output therefore produces a visibly wrong colour while
+looking entirely correct in review — the selected ticket card came out two shades too dark this
+way. The rule is to read the hex from Figma, find which starter token holds that value, and use
+that. Recorded in `CLAUDE.md` so it survives into later phases.
+
 ### One deliberate addition to the design
 
 The header carries a locale switcher that appears in no frame. The design documents the four

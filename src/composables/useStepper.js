@@ -23,11 +23,10 @@ export const STEP_STATUS = Object.freeze({
  *
  * @param {object} [options] - Optional dependencies.
  * @param {ReturnType<typeof import('./useRegistration.js').createRegistrationState>}
- *   [options.registration] - Registration state to drive. Defaults to injecting it, which is
- *   what descendants want; the wizard root must pass its own instance explicitly, since a
- *   component cannot inject a value it provides itself.
+ *   [options.registration] - Registration state to drive. Defaults to injecting it; the wizard
+ *   root must pass its own instance, since a component cannot inject what it provides.
  * @param {import('vue').Ref<number[]>|number[]} [options.erroredSteps] - Step numbers failing
- *   validation. Supplied by `useValidation` once a submit has been attempted.
+ *   validation, supplied by `useValidation` after a submit attempt.
  * @returns {{steps: import('vue').ComputedRef<Array<{number: number, key: string,
  *   status: string}>>, currentStep: import('vue').Ref<number>,
  *   isFirstStep: import('vue').ComputedRef<boolean>,

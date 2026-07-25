@@ -21,6 +21,9 @@ export const SUBMISSION_STATUS = Object.freeze({
 
 const TOTAL_STEPS = 4
 
+// The design shows VIP selected across Step 1, the Step 3 summary and the Step 4 review.
+const DEFAULT_TICKET_TYPE_ID = 'vip'
+
 /**
  * Builds a blank attendee record.
  *
@@ -50,7 +53,7 @@ function createEmptyAttendee() {
  */
 export function createRegistrationState() {
   const attendee = reactive(createEmptyAttendee())
-  const ticketTypeId = ref(null)
+  const ticketTypeId = ref(DEFAULT_TICKET_TYPE_ID)
   const selectedSessionIds = ref([])
 
   /** @type {import('vue').Ref<Record<string, {quantity: number, size: string|null}>>} */
@@ -170,7 +173,7 @@ export function createRegistrationState() {
    */
   function reset() {
     Object.assign(attendee, createEmptyAttendee())
-    ticketTypeId.value = null
+    ticketTypeId.value = DEFAULT_TICKET_TYPE_ID
     selectedSessionIds.value = []
     addonSelections.value = {}
     currentStep.value = 1

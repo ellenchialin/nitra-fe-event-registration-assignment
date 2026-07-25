@@ -5,6 +5,25 @@ export default {
     addons: 'Add-ons',
     review: 'Review',
   },
+  step1: {
+    ticketTypeTitle: 'Select Ticket Type',
+    attendeeTitle: 'Attendee Information',
+    selected: 'Selected',
+  },
+  fields: {
+    fullName: { label: 'Full Name', placeholder: 'Enter your full name' },
+    email: { label: 'Email', placeholder: 'Enter your email address' },
+    phone: { label: 'Phone', placeholder: 'Enter your phone number' },
+    company: { label: 'Company', placeholder: 'Enter your company name' },
+    jobTitle: { label: 'Job Title', placeholder: 'Enter your job title' },
+    shippingAddress: {
+      label: 'Shipping Address',
+      labelOptional: 'Shipping Address (Optional)',
+      labelRequired: 'Shipping Address *',
+      placeholder: 'Enter your shipping address',
+      requiredForMerchandise: 'Shipping address is required for merchandise orders',
+    },
+  },
   nav: {
     back: 'Back',
     next: {

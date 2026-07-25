@@ -15,8 +15,7 @@ import LocaleSwitcher from './ui/LocaleSwitcher.vue'
 
     <p class="text-h4 text-neutral">{{ event.name }}</p>
 
-    <!-- Not in the design, which does not cover i18n at all. Without it the translations are
-         unreachable from the UI. Placed right so the design's left portion is untouched. -->
+    <!-- Not in the design; see PLAN.md section 3. -->
     <LocaleSwitcher class="ml-auto" />
   </header>
 </template>

@@ -3,6 +3,7 @@ import { provideRegistration } from '../composables/useRegistration.js'
 import { useStepper } from '../composables/useStepper.js'
 import AppHeader from './AppHeader.vue'
 import WizardStepper from './WizardStepper.vue'
+import AttendeeInfoStep from './steps/AttendeeInfoStep.vue'
 import BaseButton from './ui/BaseButton.vue'
 
 // A component cannot inject what it provides, so the root passes its own instance through.
@@ -22,8 +23,9 @@ const { steps, currentStep, isFirstStep, isLastStep, advanceLabelKey, goNext, go
 
     <main class="flex-1 px-6 py-10">
       <div class="content-column">
-        <!-- Step panels land here in the following commits. -->
-        <p class="text-neutral-muted">Step {{ currentStep }}</p>
+        <AttendeeInfoStep v-if="currentStep === 1" />
+        <!-- Steps 2-4 land here in the following commits. -->
+        <p v-else class="text-neutral-muted">Step {{ currentStep }}</p>
       </div>
     </main>
 

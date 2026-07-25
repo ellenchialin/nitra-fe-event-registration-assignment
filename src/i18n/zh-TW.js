@@ -5,6 +5,25 @@ export default {
     addons: '加購項目',
     review: '確認送出',
   },
+  step1: {
+    ticketTypeTitle: '選擇票種',
+    attendeeTitle: '報名者資料',
+    selected: '已選擇',
+  },
+  fields: {
+    fullName: { label: '姓名', placeholder: '請輸入姓名' },
+    email: { label: '電子郵件', placeholder: '請輸入電子郵件' },
+    phone: { label: '電話', placeholder: '請輸入電話號碼' },
+    company: { label: '公司', placeholder: '請輸入公司名稱' },
+    jobTitle: { label: '職稱', placeholder: '請輸入職稱' },
+    shippingAddress: {
+      label: '寄送地址',
+      labelOptional: '寄送地址（選填）',
+      labelRequired: '寄送地址 *',
+      placeholder: '請輸入寄送地址',
+      requiredForMerchandise: '訂購周邊商品時必須填寫寄送地址',
+    },
+  },
   nav: {
     back: '上一步',
     next: {

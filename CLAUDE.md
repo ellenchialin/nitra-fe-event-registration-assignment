@@ -49,6 +49,12 @@ specification.
 - **The primary CTA is orange, not brand teal.** Use `bg-accent-emphasis-rest` (`#FB7429`).
   `--q-primary` in `src/css/colors.scss` is bound to brand teal, so Quasar's `color="primary"`
   renders the wrong button.
+- **Translate Figma tokens by value, never by name.** The brand ramp is shifted one step between
+  the two: Figma's `bg/brand/muted/rest` is `#EEF6F7`, but the starter's `--bg-brand-muted-rest`
+  is `#CBE5E6` — `#EEF6F7` lives in `bg-brand-subtle-rest`. `text/brand/default` and
+  `text/brand/emphasis` disagree the same way. Copying the name out of Figma's generated CSS
+  silently produces the wrong colour; look the hex up in `src/css/colors.scss` and use whichever
+  token holds it.
 - **Inter Variable must be loaded.** The starter ships no webfont; the design's weight tokens
   (630/610/570/485) are meaningless without it.
 - The Figma variable `bg/disable` returns the string `"50"`, not a colour. Use the starter's

@@ -46,3 +46,25 @@ export function formatCurrency(cents, locale = 'en-US', currency = 'USD') {
     currency,
   }).format(safeCents / CENTS_PER_UNIT)
 }
+
+/**
+ * Formats a cent amount, dropping the decimals when the value is a whole unit.
+ *
+ * Cards render `$299`; the order summary and review render `$299.00`. Both are in the design.
+ *
+ * @param {number} cents - Amount in whole cents.
+ * @param {string} [locale] - BCP 47 locale tag.
+ * @param {string} [currency] - ISO 4217 currency code.
+ * @returns {string} Localised currency string without trailing `.00`.
+ */
+export function formatPriceShort(cents, locale = 'en-US', currency = 'USD') {
+  const safeCents = Number.isFinite(cents) ? cents : 0
+  const isWholeUnit = safeCents % CENTS_PER_UNIT === 0
+
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: isWholeUnit ? 0 : 2,
+    maximumFractionDigits: 2,
+  }).format(safeCents / CENTS_PER_UNIT)
+}
