@@ -28,6 +28,15 @@ export default [
     },
   },
 
+  {
+    files: ['**/*.vue'],
+    rules: {
+      // `<script setup>` bindings are consumed by the template, which this rule cannot see —
+      // it flags every one of them as a useless assignment.
+      'no-useless-assignment': 'off',
+    },
+  },
+
   // JSDoc is required only where a reviewer actually reads the contract: exported
   // functions in the pure-logic and shared-state layers. Enforcing it everywhere
   // produces filler annotations that restate the signature and document nothing.
