@@ -35,6 +35,14 @@ export default defineConfig({
       // back to the initial `medium` width and draw unwanted borders.
       getCSS: () => '*,::before,::after{border-width:0;border-style:solid;}',
     },
+    {
+      // Quasar ships `.row, .column, .flex { display: flex; flex-wrap: wrap }` while UnoCSS's
+      // `.flex` sets display only, so every `flex` in the app silently wrapped — a row whose
+      // items exceeded the line broke instead of shrinking. Restoring the CSS default here is
+      // safe: the flex-wrap-* utilities are emitted after preflights and still win wherever
+      // wrapping is deliberate.
+      getCSS: () => '.flex{flex-wrap:nowrap;}',
+    },
   ],
   theme: uiTheme,
   extendTheme: [uiExtendTheme],

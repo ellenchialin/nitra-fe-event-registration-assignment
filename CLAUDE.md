@@ -65,6 +65,11 @@ specification.
   token holds it.
 - **Inter Variable must be loaded.** The starter ships no webfont; the design's weight tokens
   (630/610/570/485) are meaningless without it.
+- **Quasar's `.flex` sets `flex-wrap: wrap`**, UnoCSS's sets `display` only, so before the
+  preflight in `uno.config.js` every `flex` in this app wrapped. That preflight restores
+  `flex-wrap: nowrap` for `.flex`; do not remove it, and keep using `flex-wrap` where wrapping is
+  intended (utilities are emitted after preflights and still win). `.row` and `.column` carry the
+  same rule — avoid those class names entirely.
 - The Figma variable `bg/disable` returns the string `"50"`, not a colour. Use the starter's
   `bg-disable` token.
 - Capacity applies to add-ons as well as sessions (`ws2` is 25/25 and sold out), though the README
