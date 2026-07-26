@@ -23,7 +23,7 @@ not cosmetic.
 | 0     | Environment (Node pin), Figma access, design recon                                   | 0.5h | ✅ Done       |
 | 1     | Foundation — `utils/` (time, currency, validators), `useRegistration` state          | 1h   | ✅ Done       |
 | 2     | Wizard shell + stepper, Step 1 — ticket cards, attendee form, `FormField`            | 1.5h | ✅ Done       |
-| 3     | Step 2 — day tabs, session grid, capacity bars, conflict detection                   | 1h   | ▢ Not started |
+| 3     | Step 2 — day tabs, session grid, capacity bars, conflict detection                   | 1h   | ✅ Done       |
 | 4     | Step 3 — category tabs, workshop conflicts, size/qty, shipping banner, order summary | 1.5h | ▢ Not started |
 | 5     | Step 4 — review cards, unified validation, error navigation, submit + success        | 1h   | ▢ Not started |
 | 6     | Polish — interactive states, transitions, responsive, URL sync                       | 1h   | ▢ Not started |
@@ -115,6 +115,48 @@ unreliable — which Phase 5 needs to reach the first validation error — and c
 wrong thing" problem, with noticeably worse momentum scrolling on iOS. The header is deliberately
 left to scroll away: pinning it too would cost 153px of permanent chrome, 17% of a 900px viewport
 before the action bar's 72px, and it carries only branding and the locale switcher.
+
+**Phase 3 — Step 2** ✅ `643787c` `8816c8a` `2aa300b`
+
+Day tabs, the session grid, and capacity bars. Card geometry matches frame `1072:912` exactly —
+592×162 with 16px gaps, child heights 20/20/16/14/28.
+
+_Colour sampled, not guessed._ With the Figma MCP server disconnected mid-phase, the capacity
+bands were recovered by serving the design PNG through the dev server and reading exact pixels off
+a canvas. That produced hard values (41% → `#264D4F`, 58% → `#918108`, 78/81/97% → `#C94A03`, full
+→ `#C71A1A`), placing the band cuts at 50 and 75. The same technique measured the tab corner radii
+by fitting the arc: the inset profile `[7,4,3,2,1,1,1,0]` fits r=8, so the segmented tab uses an
+8px literal like the logo tile, inside a 10px container.
+
+_Card edges are inset shadows, not borders._ Figma strokes sit inside the frame, so a CSS border
+measures outside the design's numbers: a bordered session card came out 164px against the design's
+162px, and thickening the stroke to 2px for the selected state grew it again, making the card and
+its whole grid row jump on selection. Both edges are now inset `box-shadow` layers
+(`card-edge` / `card-edge-selected`), which cost no space. Session cards measure exactly 162px in
+every state, with a measured selection delta of 0.
+
+The elevation shadow belongs on session cards too — sampling below a card's bottom edge shows the
+pixels ramping `235 → 240 → 244 → 248 → 250` over ~10px and only ~3px sideways, the signature of the
+same `0 4px 16px` shadow the ticket cards use. Since `box-shadow` does not stack across utilities,
+the edge and elevation layers are declared together in one shortcut shared by both card types.
+
+The same jump existed on the ticket cards, where the "Selected" badge entered the flow on selection
+and shunted the row by 32px. It is now always laid out and hidden until selected, holding the row
+constant.
+
+_Capacity label colours come from Figma's own inspector, not from the nearest semantic token._ The
+labels are filled `orange/700` (`#A13B02`) and `text/brand/emphasis` (`#264D4F`). I had initially
+snapped them to `text-accent-emphasis` (`#C94A03`) and `text-brand` to stay on semantic tokens,
+which was wrong on both counts — and `#264D4F` is the name-shift trap again, since the starter's
+`--text-brand-emphasis` is `#1E3C3E`. Neither value exists in the starter's semantic text scale, so
+these two use palette utilities: still theme-backed, but honest about the value the design asks for.
+
+_Open, unresolved:_ the ticket-card row renders 304px where the design frame is 288px. The card's
+own children account for exactly 288, every ancestor in the chain is fully accounted for, and a
+detached clone of the row at the same 1200px width measures exactly 288 — yet the live row is 16px
+taller, and neither `flex-wrap: nowrap`, a zeroed row gap, `fit-content`, nor `align-items:
+flex-start` changes it. It is cosmetic and stable across selections, so it is parked rather than
+papered over with a hardcoded height.
 
 ---
 
@@ -274,6 +316,72 @@ Copying the token name out of Figma's output therefore produces a visibly wrong 
 looking entirely correct in review — the selected ticket card came out two shades too dark this
 way. The rule is to read the hex from Figma, find which starter token holds that value, and use
 that. Recorded in `CLAUDE.md` so it survives into later phases.
+
+### Quasar's colour helpers silently override the semantic tokens
+
+Quasar ships 596 `.text-*` / `.bg-*` helper classes, all with `!important`. Three of them collide
+exactly with the starter's semantic shortcut names — `text-accent`, `text-info`, `text-warning` —
+and win, substituting a Quasar palette colour for the design token. `text-warning` rendered
+`#FADD00` (Quasar's `--q-warning`) instead of the design's `#918108`.
+
+This is nastier than a normal specificity bug because the markup, the shortcut definition and the
+generated CSS are all correct; only the cascade is wrong, and only for three names out of dozens.
+
+My first fix re-asserted those three in `app.scss` with `!important`. That works but commits the
+project to fighting the cascade permanently, so it was replaced. Quasar exposes no config to
+exclude its helper CSS — `framework.cssAddon` only adds classes — and specificity cannot help,
+since `!important` outranks any selector weight. UnoCSS's `!` prefix or global `important: true`
+would only relocate the `!important`.
+
+The collision is sidestepped instead, by using the design system's own canonical names. Figma's
+token reference frame lists these as `text/warning/default` and `text/info/default`, matching the
+CSS variables — the starter's bare `text-warning` is shorthand, and it is only the shorthand that
+Quasar defines. Adding `text-accent-default`, `text-info-default` and `text-warning-default` to
+`semantic.js` therefore is not a workaround name at all: it is the more correct one, and would have
+been the better choice with or without the collision. Quasar's palette stops at `-14`, so the
+`-default` suffix is permanently safe, and the codebase now contains no `!important` anywhere.
+
+Worth recording that I had the token reference frame from Phase 0 and still framed these as
+invented aliases; the canonical naming was sitting in a screenshot I had already read.
+
+Quasar also styles `[disabled]` with `opacity: 0.6 !important`, which quietly washed out the
+sold-out session card. Replacing the `disabled` attribute with `aria-disabled` plus a guarded
+click handler both restores the design's contrast and keeps the card focusable — a `disabled`
+button leaves the tab order entirely, so a keyboard or screen-reader user could not discover the
+session exists, which matters when "Sold Out" is the information being conveyed.
+
+### The design never defines a sold-out card
+
+Step 2's frame contains a sold-out data rendering and an unavailable card treatment, but never on
+the same card:
+
+- `s2` is genuinely at capacity (120/120) and renders correctly as data — red full bar, "Sold Out"
+  label — but its card is styled as **selected**: brand border, `#EEF6F7` surface, checked box.
+  Selected and sold out is not a state that can exist.
+- `s5` is the greyed card — muted surface, muted text, and no checkbox drawn at all (sampling that
+  corner returns `#EBEEEF`, its own background, where an available card returns `#5C6970`). But
+  `s5` has 38 spots left, so its data does not justify the treatment.
+
+The greyed `s5` is most likely demonstrating a _time conflict_: `s4` Modern CSS (13:00–14:30) is
+selected and `s5` (13:30–15:00) overlaps it, while `s6` overlaps nothing selected and is not
+greyed. Two of three cards fit; the exception is `s3`, which overlaps the checked `s2` and is not
+greyed — plausibly an oversight, given `s2` is the sold-out card the designer also drew as checked.
+
+Even so, conflicts do not grey out sessions here. The README is explicit that "users may freely
+select any available sessions" with conflict validation "deferred to Step 4 submit time", and the
+assignment doc ranks above the mockup. Blocking selection would also make the Step 4 session
+conflict validation unreachable — you could never assemble a conflicting pair to submit — deleting
+a graded requirement, and it would break the retroactive workshop-conflict case, which depends on a
+conflict being created after the fact.
+
+Conflicts are therefore detected in `useSessions` but surfaced only at Step 4, where the offending
+sessions get a danger border. Step 2 stays visually silent. I briefly built a non-blocking "time
+conflict" chip on the card as a middle ground and removed it: it duplicated feedback that Step 4
+already owns, and two places reporting the same rule is how they drift apart.
+
+The greyed treatment goes to sold-out sessions instead. It is the only "unavailable" visual the
+design provides, `s2`'s selected-and-sold-out rendering cannot be the intended answer, and a
+sold-out card that looks identical to a selectable one is poor UX regardless of the mockup.
 
 ### One deliberate addition to the design
 

@@ -10,6 +10,21 @@ export default {
     attendeeTitle: 'Attendee Information',
     selected: 'Selected',
   },
+  step2: {
+    title: 'Select Sessions',
+    selectDay: 'Conference day',
+    selectedCount: 'No sessions selected | 1 session selected | {count} sessions selected',
+  },
+  tracks: {
+    main: 'Main',
+    frontend: 'Frontend',
+    backend: 'Backend',
+    devops: 'DevOps',
+  },
+  capacity: {
+    spotsLeft: '{count} spots left',
+    soldOut: 'Sold Out',
+  },
   fields: {
     fullName: { label: 'Full Name', placeholder: 'Enter your full name' },
     email: { label: 'Email', placeholder: 'Enter your email address' },

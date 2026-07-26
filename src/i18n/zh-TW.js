@@ -10,6 +10,24 @@ export default {
     attendeeTitle: '報名者資料',
     selected: '已選擇',
   },
+  step2: {
+    title: '選擇議程',
+    selectDay: '會議日期',
+    // Chinese has no plural forms, but the message must carry the same number of branches as
+    // en-US: Vue I18n's default rule reads a two-branch message as singular|plural, which maps
+    // count 0 to the second branch and count 1 to the first.
+    selectedCount: '尚未選擇議程 | 已選擇 {count} 場議程 | 已選擇 {count} 場議程',
+  },
+  tracks: {
+    main: '主議程',
+    frontend: '前端',
+    backend: '後端',
+    devops: 'DevOps',
+  },
+  capacity: {
+    spotsLeft: '剩餘 {count} 個名額',
+    soldOut: '已額滿',
+  },
   fields: {
     fullName: { label: '姓名', placeholder: '請輸入姓名' },
     email: { label: '電子郵件', placeholder: '請輸入電子郵件' },
