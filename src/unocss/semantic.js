@@ -285,6 +285,15 @@ export const semanticTextShortcut = {
   'text-info-emphasis': 'text-[var(--text-info-emphasis)]',
   'text-warning': 'text-[var(--text-warning-default)]',
   'text-warning-emphasis': 'text-[var(--text-warning-emphasis)]',
+
+  // Canonical names from the design system: Figma's token reference lists these as
+  // text/warning/default and text/info/default, matching the CSS variables. The bare
+  // text-warning / text-info / text-accent above are shorthand, and Quasar defines those three
+  // names itself with !important, so the shorthand silently renders Quasar's palette instead.
+  // Prefer these.
+  'text-accent-default': 'text-[var(--text-accent-default)]',
+  'text-info-default': 'text-[var(--text-info-default)]',
+  'text-warning-default': 'text-[var(--text-warning-default)]',
 }
 
 export const semanticBgShortcut = {

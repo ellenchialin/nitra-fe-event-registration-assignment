@@ -49,6 +49,14 @@ specification.
 - **The primary CTA is orange, not brand teal.** Use `bg-accent-emphasis-rest` (`#FB7429`).
   `--q-primary` in `src/css/colors.scss` is bound to brand teal, so Quasar's `color="primary"`
   renders the wrong button.
+- **Use `text-accent-default` / `text-info-default` / `text-warning-default`, never the bare
+  `text-accent` / `text-info` / `text-warning`.** The `-default` forms are the design system's
+  canonical names — Figma's token reference frame lists `text/warning/default` and
+  `text/info/default`, matching the CSS variables. The bare names are shorthand, and Quasar
+  defines those three itself with `!important`, so the shorthand silently renders Quasar's
+  palette (`text-warning` gives `#FADD00`, not the design's `#918108`). These are the only three
+  collisions: every other semantic shortcut carries a suffix Quasar does not define, and its
+  palette stops at `-14`.
 - **Translate Figma tokens by value, never by name.** The brand ramp is shifted one step between
   the two: Figma's `bg/brand/muted/rest` is `#EEF6F7`, but the starter's `--bg-brand-muted-rest`
   is `#CBE5E6` — `#EEF6F7` lives in `bg-brand-subtle-rest`. `text/brand/default` and
