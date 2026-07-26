@@ -89,6 +89,7 @@ const shippingLabel = computed(() =>
           :label="shippingLabel"
           :placeholder="$t('fields.shippingAddress.placeholder')"
           :required="isShippingRequired"
+          :emphasis="isShippingRequired"
           :error-message="fieldError('shippingAddress')"
           autocomplete="street-address"
         />

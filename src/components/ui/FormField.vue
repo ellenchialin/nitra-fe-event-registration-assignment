@@ -9,6 +9,10 @@ const props = defineProps({
   type: { type: String, default: 'text' },
   autocomplete: { type: String, default: undefined },
   required: { type: Boolean, default: false },
+  // Draws the heavier border from the design's "Shipping Address — Conditional States" frame,
+  // which marks a requirement that has just changed. A field that is always required does not
+  // use it — otherwise every required input reads as though something about it just changed.
+  emphasis: { type: Boolean, default: false },
   errorMessage: { type: String, default: '' },
 })
 
@@ -18,7 +22,7 @@ const hasError = computed(() => Boolean(props.errorMessage))
 
 const borderClass = computed(() => {
   if (hasError.value) return 'border-danger-emphasis'
-  return props.required ? 'border-neutral-emphasis' : 'border-neutral-muted'
+  return props.emphasis ? 'border-neutral-emphasis' : 'border-neutral-muted'
 })
 </script>
 
@@ -38,6 +42,7 @@ const borderClass = computed(() => {
       :type="type"
       :placeholder="placeholder"
       :autocomplete="autocomplete"
+      :aria-required="required || undefined"
       :aria-invalid="hasError || undefined"
       :aria-describedby="hasError ? errorId : undefined"
       class="h-11 rounded-m border bg-surface-l0 px-3 text-[16px] text-neutral transition-colors placeholder:text-neutral-quiet focus:border-brand-emphasis focus:outline-none"
