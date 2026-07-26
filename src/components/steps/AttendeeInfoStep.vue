@@ -2,16 +2,17 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRegistration } from '../../composables/useRegistration.js'
+import { useValidation } from '../../composables/useValidation.js'
 import { event } from '../../mocks/event.js'
-import { isNonEmpty } from '../../utils/validators.js'
 import FormField from '../ui/FormField.vue'
 import TicketCard from '../ui/TicketCard.vue'
 
 const { t } = useI18n()
-const { attendee, ticketTypeId, hasMerchandise, submitAttempted } = useRegistration()
+const { attendee, ticketTypeId, hasMerchandise } = useRegistration()
+const { fieldError } = useValidation()
 
-// Label and border react to merchandise immediately; the error waits for a submit attempt, so
-// nothing the user types here triggers inline validation.
+// The label and border react to merchandise immediately; the message comes from the shared rule
+// set, which only reports once the user has attempted to submit.
 const isShippingRequired = computed(() => hasMerchandise.value)
 
 const shippingLabel = computed(() =>
@@ -19,13 +20,6 @@ const shippingLabel = computed(() =>
     ? t('fields.shippingAddress.labelRequired')
     : t('fields.shippingAddress.labelOptional'),
 )
-
-const shippingError = computed(() => {
-  const isMissing = isShippingRequired.value && !isNonEmpty(attendee.shippingAddress)
-  return submitAttempted.value && isMissing
-    ? t('fields.shippingAddress.requiredForMerchandise')
-    : ''
-})
 </script>
 
 <template>
@@ -52,6 +46,8 @@ const shippingError = computed(() => {
           v-model="attendee.fullName"
           :label="$t('fields.fullName.label')"
           :placeholder="$t('fields.fullName.placeholder')"
+          :required="true"
+          :error-message="fieldError('fullName')"
           autocomplete="name"
         />
         <FormField
@@ -59,6 +55,8 @@ const shippingError = computed(() => {
           type="email"
           :label="$t('fields.email.label')"
           :placeholder="$t('fields.email.placeholder')"
+          :required="true"
+          :error-message="fieldError('email')"
           autocomplete="email"
         />
         <FormField
@@ -66,12 +64,16 @@ const shippingError = computed(() => {
           type="tel"
           :label="$t('fields.phone.label')"
           :placeholder="$t('fields.phone.placeholder')"
+          :required="true"
+          :error-message="fieldError('phone')"
           autocomplete="tel"
         />
         <FormField
           v-model="attendee.company"
           :label="$t('fields.company.label')"
           :placeholder="$t('fields.company.placeholder')"
+          :required="true"
+          :error-message="fieldError('company')"
           autocomplete="organization"
         />
         <FormField
@@ -87,7 +89,7 @@ const shippingError = computed(() => {
           :label="shippingLabel"
           :placeholder="$t('fields.shippingAddress.placeholder')"
           :required="isShippingRequired"
-          :error-message="shippingError"
+          :error-message="fieldError('shippingAddress')"
           autocomplete="street-address"
         />
       </div>

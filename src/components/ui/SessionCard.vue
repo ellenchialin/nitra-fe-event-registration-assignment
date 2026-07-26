@@ -8,6 +8,7 @@ import TrackBadge from './TrackBadge.vue'
 const props = defineProps({
   session: { type: Object, required: true },
   selected: { type: Boolean, default: false },
+  conflicted: { type: Boolean, default: false },
 })
 
 defineEmits(['toggle'])
@@ -34,9 +35,11 @@ const textClass = computed(() => (soldOut.value ? 'text-neutral-disabled' : null
     :class="[
       soldOut
         ? 'card-edge cursor-not-allowed bg-surface-l2'
-        : selected
-          ? 'card-edge-selected bg-brand-subtle-rest'
-          : 'card-edge bg-surface-l0 hover:bg-neutral-quiet-hover',
+        : conflicted
+          ? 'card-edge-danger bg-danger-subtle-rest'
+          : selected
+            ? 'card-edge-selected bg-brand-subtle-rest'
+            : 'card-edge bg-surface-l0 hover:bg-neutral-quiet-hover',
     ]"
     @click="soldOut || $emit('toggle', session.id)"
   >

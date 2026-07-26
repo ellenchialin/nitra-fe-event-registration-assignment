@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useFormatters } from '../../composables/useFormatters.js'
 import { useSessions } from '../../composables/useSessions.js'
+import { useValidation } from '../../composables/useValidation.js'
 import SegmentedTabs from '../ui/SegmentedTabs.vue'
 import SessionCard from '../ui/SessionCard.vue'
 
@@ -13,6 +14,8 @@ const {
   isSessionSelected,
   toggleSession,
 } = useSessions()
+
+const { conflictingSessionIds } = useValidation()
 
 const { dayLabel } = useFormatters()
 
@@ -37,6 +40,7 @@ const dayTabs = computed(() =>
         :key="session.id"
         :session="session"
         :selected="isSessionSelected(session.id)"
+        :conflicted="conflictingSessionIds.has(session.id)"
         @toggle="toggleSession"
       />
     </div>
