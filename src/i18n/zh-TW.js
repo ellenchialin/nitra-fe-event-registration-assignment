@@ -18,6 +18,22 @@ export default {
     // count 0 to the second branch and count 1 to the first.
     selectedCount: '尚未選擇議程 | 已選擇 {count} 場議程 | 已選擇 {count} 場議程',
   },
+  step3: {
+    title: '選擇加購項目',
+    selectCategory: '加購類別',
+    categories: {
+      workshop: '工作坊',
+      meal: '餐飲方案',
+      merchandise: '周邊商品',
+    },
+    conflictsWith: '與 {sessions} 時間衝突',
+  },
+  summary: {
+    title: '訂單明細',
+    ticketLine: '{name} 票',
+    workshopDiscount: '工作坊折扣（{ticket} {percent}%）',
+    total: '總計',
+  },
   tracks: {
     main: '主議程',
     frontend: '前端',
@@ -26,6 +42,7 @@ export default {
   },
   capacity: {
     spotsLeft: '剩餘 {count} 個名額',
+    spotsRemaining: '尚有 {count} 個名額',
     soldOut: '已額滿',
   },
   fields: {

@@ -15,6 +15,22 @@ export default {
     selectDay: 'Conference day',
     selectedCount: 'No sessions selected | 1 session selected | {count} sessions selected',
   },
+  step3: {
+    title: 'Select Add-ons',
+    selectCategory: 'Add-on category',
+    categories: {
+      workshop: 'Workshops',
+      meal: 'Meal Packages',
+      merchandise: 'Merchandise',
+    },
+    conflictsWith: 'Time conflict with {sessions}',
+  },
+  summary: {
+    title: 'Order Summary',
+    ticketLine: '{name} Ticket',
+    workshopDiscount: 'Workshop discount ({ticket} {percent}%)',
+    total: 'Total',
+  },
   tracks: {
     main: 'Main',
     frontend: 'Frontend',
@@ -23,6 +39,7 @@ export default {
   },
   capacity: {
     spotsLeft: '{count} spots left',
+    spotsRemaining: '{count} spots remaining',
     soldOut: 'Sold Out',
   },
   fields: {

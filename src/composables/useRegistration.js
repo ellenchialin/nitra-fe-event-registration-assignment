@@ -1,6 +1,8 @@
 import { computed, inject, provide, reactive, ref } from 'vue'
 import { addons } from '../mocks/addons.js'
 import { sessions } from '../mocks/sessions.js'
+import { isSoldOut } from '../utils/capacity.js'
+import { schedulesOverlap } from '../utils/time.js'
 
 /** Injection key for the wizard's shared registration state. */
 export const REGISTRATION_KEY = Symbol('registration')
@@ -21,8 +23,11 @@ export const SUBMISSION_STATUS = Object.freeze({
 
 const TOTAL_STEPS = 4
 
+/** The one ticket type whose perks include the workshop discount. */
+export const VIP_TICKET_TYPE_ID = 'vip'
+
 // The design shows VIP selected across Step 1, the Step 3 summary and the Step 4 review.
-const DEFAULT_TICKET_TYPE_ID = 'vip'
+const DEFAULT_TICKET_TYPE_ID = VIP_TICKET_TYPE_ID
 
 /**
  * Builds a blank attendee record.
@@ -113,7 +118,7 @@ export function createRegistrationState() {
    */
   function setAddonQuantity(addonId, quantity) {
     const addon = addonById.get(addonId)
-    if (!addon) return
+    if (!addon || unavailableAddonIds.value.has(addonId)) return
 
     const maximum = addon.maxQuantity ?? 1
     const clamped = Math.min(Math.max(Math.trunc(quantity) || 0, 0), maximum)
@@ -190,11 +195,43 @@ export function createRegistrationState() {
       .sort((a, b) => new Date(a.date) - new Date(b.date)),
   )
 
+  /**
+   * Add-ons that cannot be ordered: sold out, or scheduled against a selected session.
+   *
+   * Derived rather than enforced by a watcher, so a workshop that a later session choice puts
+   * out of reach simply stops counting — and comes back intact if that session is dropped.
+   */
+  const unavailableAddonIds = computed(() => {
+    const chosen = selectedSessions.value
+
+    return new Set(
+      addons
+        .filter(
+          (addon) => isSoldOut(addon) || chosen.some((session) => schedulesOverlap(addon, session)),
+        )
+        .map((addon) => addon.id),
+    )
+  })
+
   /** Selected add-ons joined to their source records, in the order they appear in the data. */
   const selectedAddonLines = computed(() =>
     addons
-      .filter((addon) => (addonSelections.value[addon.id]?.quantity ?? 0) > 0)
+      .filter(
+        (addon) =>
+          (addonSelections.value[addon.id]?.quantity ?? 0) > 0 &&
+          !unavailableAddonIds.value.has(addon.id),
+      )
       .map((addon) => ({ addon, ...addonSelections.value[addon.id] })),
+  )
+
+  /**
+   * Ordered merchandise that offers sizes but has none chosen.
+   *
+   * A size is only meaningful once the item is actually in the order, so this reads the priced
+   * lines rather than every sized product. Consumed by the Step 4 validation rules.
+   */
+  const merchandiseMissingSize = computed(() =>
+    selectedAddonLines.value.filter((line) => line.addon.sizes?.length && !line.size),
   )
 
   /** Whether any merchandise is in the order — drives the shipping-address requirement. */
@@ -215,7 +252,9 @@ export function createRegistrationState() {
 
     // Derived selections
     selectedSessions,
+    unavailableAddonIds,
     selectedAddonLines,
+    merchandiseMissingSize,
     hasMerchandise,
 
     // Mutations

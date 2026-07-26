@@ -3,6 +3,7 @@ import { provideRegistration } from '../composables/useRegistration.js'
 import { useStepper } from '../composables/useStepper.js'
 import AppHeader from './AppHeader.vue'
 import WizardStepper from './WizardStepper.vue'
+import AddonSelectionStep from './steps/AddonSelectionStep.vue'
 import AttendeeInfoStep from './steps/AttendeeInfoStep.vue'
 import SessionSelectionStep from './steps/SessionSelectionStep.vue'
 import BaseButton from './ui/BaseButton.vue'
@@ -26,7 +27,8 @@ const { steps, currentStep, isFirstStep, isLastStep, advanceLabelKey, goNext, go
       <div class="content-column">
         <AttendeeInfoStep v-if="currentStep === 1" />
         <SessionSelectionStep v-else-if="currentStep === 2" />
-        <!-- Steps 3-4 land here in the following commits. -->
+        <AddonSelectionStep v-else-if="currentStep === 3" />
+        <!-- Step 4 lands here in a following commit. -->
         <p v-else class="text-neutral-muted">Step {{ currentStep }}</p>
       </div>
     </main>
