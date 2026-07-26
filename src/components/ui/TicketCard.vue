@@ -16,11 +16,11 @@ const { priceShort } = useFormatters()
     type="button"
     role="radio"
     :aria-checked="selected"
-    class="flex flex-1 flex-col items-start gap-3 rounded-m p-5 text-left shadow-[0px_4px_16px_0px_rgba(0,0,0,0.08),0px_1px_3px_0px_rgba(0,0,0,0.04)] transition-colors"
+    class="flex flex-1 flex-col items-start gap-3 rounded-m p-5 text-left transition-[background-color,box-shadow] duration-150"
     :class="
       selected
-        ? 'border-2 border-brand-emphasis bg-brand-subtle-rest'
-        : 'border border-neutral-muted bg-surface-l1 hover:bg-neutral-subtle-hover'
+        ? 'card-edge-selected bg-brand-subtle-rest'
+        : 'card-edge bg-surface-l1 hover:bg-neutral-subtle-hover'
     "
   >
     <span class="flex w-full items-center justify-between text-subtitle1 text-neutral">
@@ -35,9 +35,12 @@ const { priceShort } = useFormatters()
       <span class="text-[12px] leading-4 text-neutral-muted">{{ perk }}</span>
     </span>
 
+    <!-- Always laid out, hidden until selected: adding it on selection would change the card's
+         height and shunt the whole row. -->
     <span
-      v-if="selected"
       class="rounded-full bg-success-bold-rest px-[9px] py-[3px] text-[11px] leading-[14px] font-medium text-inverse"
+      :class="{ invisible: !selected }"
+      :aria-hidden="!selected || undefined"
     >
       <span aria-hidden="true">✓</span>
       {{ $t('step1.selected') }}

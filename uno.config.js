@@ -43,6 +43,16 @@ export default defineConfig({
     {
       // Sits inside a horizontally padded band so the gutter applies only below 1200px.
       'content-column': 'mx-auto w-full max-w-content',
+
+      // Card edge and elevation in one declaration, since box-shadow does not stack across
+      // utilities. The edge is an inset shadow rather than a border because Figma strokes sit
+      // inside the frame: a bordered card measures 2px taller than the design and grows again
+      // when selection thickens the stroke. Inset costs no space, so session cards hold the
+      // design's 162px in every state.
+      'card-edge':
+        'shadow-[inset_0_0_0_1px_var(--border-neutral-muted),0px_4px_16px_0px_rgba(0,0,0,0.08),0px_1px_3px_0px_rgba(0,0,0,0.04)]',
+      'card-edge-selected':
+        'shadow-[inset_0_0_0_2px_var(--border-brand-emphasis),0px_4px_16px_0px_rgba(0,0,0,0.08),0px_1px_3px_0px_rgba(0,0,0,0.04)]',
     },
   ],
 })
