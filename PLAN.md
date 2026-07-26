@@ -213,7 +213,7 @@ The merchandise frame (`1149:565`) also draws its text at 19/15/13px line boxes 
 frame uses 20/16/14 — so merchandise cards render 134px against the frame's 131. The typography
 tokens match the primary frame exactly; the secondary frame is the inconsistency §3 warns about.
 
-**Phase 5 — Step 4 and submission**
+**Phase 5 — Step 4 and submission** ✅ `4e86d5d` `c611c6f` `695ea09`
 
 Review sections with Edit links, the unified rule set, error navigation, submit and the success
 screen. Geometry matches frame `1074:897`: review cards at 20px padding with 12px rows (228 / 144 /
