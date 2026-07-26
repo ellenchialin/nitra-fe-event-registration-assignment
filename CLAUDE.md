@@ -62,7 +62,9 @@ specification.
   is `#CBE5E6` — `#EEF6F7` lives in `bg-brand-subtle-rest`. `text/brand/default` and
   `text/brand/emphasis` disagree the same way. Copying the name out of Figma's generated CSS
   silently produces the wrong colour; look the hex up in `src/css/colors.scss` and use whichever
-  token holds it.
+  token holds it. When no semantic token holds the value, use the **palette utility** for that hex
+  (`text-teal-500` for `#3A7679`, `text-teal-700` for `#264D4F`, `text-orange-700` for `#A13B02`) —
+  still theme-backed, and honest about the value. Do not snap to the nearest semantic token.
 - **Inter Variable must be loaded.** The starter ships no webfont; the design's weight tokens
   (630/610/570/485) are meaningless without it.
 - **Quasar's `.flex` sets `flex-wrap: wrap`**, UnoCSS's sets `display` only, so before the
@@ -91,10 +93,19 @@ src/
   i18n/          en.js zh-TW.js
 ```
 
-Validation is one declarative rule array (`{ step, field, validate, message }`) reduced into
-`errorsByStep`. Stepper badges, the error panel, danger card borders, and `— (required)`
-placeholders all derive from it — never maintain those separately. Errors are gated behind
-`submitAttempted`.
+Validation is one declarative rule array (`VALIDATION_RULES` in `useValidation.js`) reduced into
+the views the UI needs. Stepper badges, the error banner, danger card borders, `— (required)`
+review placeholders and Step 1's inline field errors all derive from it — never maintain those
+separately. `validate` takes a flat snapshot, not the reactive state, so rules stay pure. A rule
+that can fail repeatedly interpolates the offenders into one message rather than becoming a
+factory.
+
+Errors are gated behind `submitAttempted`, except `isValid`, which submit must read before any
+attempt. The review's `— (required)` text always shows; only its danger colour is gated.
+
+**Composables reading registration state take an optional `{ registration }`**, because the wizard
+root provides that state and so cannot inject it. `useStepper` and `useValidation` both do this;
+follow the pattern rather than rediscovering the throw.
 
 ## Design reference
 

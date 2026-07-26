@@ -18,8 +18,16 @@ p,
 figure,
 blockquote,
 dl,
-dd {
+dd,
+ul,
+ol {
   margin: 0;
+}
+
+// Lists also carry a user-agent padding-inline-start that indents them past the design's grid.
+ul,
+ol {
+  padding: 0;
 }
 
 // Without a reset, buttons keep their user-agent chrome — a grey face, 1px 6px padding and a

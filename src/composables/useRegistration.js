@@ -26,6 +26,22 @@ const TOTAL_STEPS = 4
 /** The one ticket type whose perks include the workshop discount. */
 export const VIP_TICKET_TYPE_ID = 'vip'
 
+// The design's "TC2025-47291" carries the same stale branding as its "WebDev Summit 2025" header,
+// so the prefix follows the data rather than the mockup.
+const CONFIRMATION_PREFIX = 'WDS2028'
+
+// Long enough to make the loading state visible, short enough not to feel broken.
+const SUBMIT_LATENCY_MS = 900
+
+/**
+ * Builds a mock confirmation code, e.g. `WDS2028-47291`.
+ *
+ * @returns {string} A confirmation code with a five-digit suffix.
+ */
+function createConfirmationCode() {
+  return `${CONFIRMATION_PREFIX}-${Math.floor(10000 + Math.random() * 90000)}`
+}
+
 // The design shows VIP selected across Step 1, the Step 3 summary and the Step 4 review.
 const DEFAULT_TICKET_TYPE_ID = VIP_TICKET_TYPE_ID
 
@@ -172,6 +188,21 @@ export function createRegistrationState() {
   }
 
   /**
+   * Runs the mock submission and issues a confirmation code.
+   *
+   * Validity is the caller's business — this only performs the submission it is asked for, so the
+   * rule set stays the single authority on whether the form may be sent.
+   *
+   * @returns {Promise<void>} Resolves once the submission has succeeded.
+   */
+  async function submitRegistration() {
+    submissionStatus.value = SUBMISSION_STATUS.SUBMITTING
+    await new Promise((resolve) => setTimeout(resolve, SUBMIT_LATENCY_MS))
+    confirmationCode.value = createConfirmationCode()
+    submissionStatus.value = SUBMISSION_STATUS.SUCCEEDED
+  }
+
+  /**
    * Restores the wizard to a blank state, used by the success screen's "Back to Home".
    *
    * @returns {void}
@@ -265,6 +296,7 @@ export function createRegistrationState() {
     toggleAddon,
     setAddonSize,
     goToStep,
+    submitRegistration,
     reset,
   }
 }

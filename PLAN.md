@@ -25,7 +25,7 @@ not cosmetic.
 | 2     | Wizard shell + stepper, Step 1 — ticket cards, attendee form, `FormField`            | 1.5h | ✅ Done       |
 | 3     | Step 2 — day tabs, session grid, capacity bars, conflict detection                   | 1h   | ✅ Done       |
 | 4     | Step 3 — category tabs, workshop conflicts, size/qty, shipping banner, order summary | 1.5h | ✅ Done       |
-| 5     | Step 4 — review cards, unified validation, error navigation, submit + success        | 1h   | ▢ Not started |
+| 5     | Step 4 — review cards, unified validation, error navigation, submit + success        | 1h   | ✅ Done       |
 | 6     | Polish — interactive states, transitions, responsive, URL sync                       | 1h   | ▢ Not started |
 | 7     | i18n pass + this document                                                            | 1h   | ▢ Not started |
 | 8     | Acceptance pass — scenarios below, clean-checkout smoke test                         | 0.5h | ▢ Not started |
@@ -212,6 +212,62 @@ rather than hidden.
 The merchandise frame (`1149:565`) also draws its text at 19/15/13px line boxes where the workshop
 frame uses 20/16/14 — so merchandise cards render 134px against the frame's 131. The typography
 tokens match the primary frame exactly; the secondary frame is the inconsistency §3 warns about.
+
+**Phase 5 — Step 4 and submission**
+
+Review sections with Edit links, the unified rule set, error navigation, submit and the success
+screen. Geometry matches frame `1074:897`: review cards at 20px padding with 12px rows (228 / 144 /
+88 for six, three and one row), the pricing card at 8px rows, and a 48px submit button in an 80px
+action bar against 40px in 72px on every other step.
+
+_The two review frames are not inconsistent — they follow a rule._ The normal frame lists Job Title
+but no Shipping Address; the error frame lists Shipping Address but no Job Title. Rather than pick
+one and call the other a Figma slip, both fall out of a single rule: **a row appears when it has a
+value, or when it is required.** Job Title is optional and empty in the error frame, so it is
+dropped; Shipping Address is required there because that order contains merchandise. Checked
+against both frames' add-on lists, which confirm the merchandise presence each implies.
+
+_Validation is one array, and nothing maintains a second copy._ `VALIDATION_RULES` is nine entries
+of `{ step, field, messageKey, validate }`, and the stepper's red badges, the error banner, the
+`— (required)` review placeholders, the inline field errors on Step 1 and the danger borders on
+Step 2 all reduce from it. Step 1's bespoke shipping-address check, written in Phase 2 before the
+rule set existed, was deleted in favour of the rule — it was the exact duplication CLAUDE.md warns
+against.
+
+Two details worth stating. `validate` takes a flat snapshot rather than the reactive state, so each
+rule is a pure predicate that can be exercised without mounting anything. And a rule that can fail
+several times over — overlapping sessions, unsized merchandise — stays one rule and interpolates
+the offenders into its message, rather than becoming an error factory that would break the "array
+of independent booleans" shape.
+
+_Gating, precisely._ `isValid` is ungated, because submit must consult it before there has been an
+attempt. Everything the user sees waits for `submitAttempted`. The review's `— (required)`
+placeholder is the one deliberate split: the text always shows, because an empty required field
+genuinely has no value and saying so is information rather than an accusation, but its danger
+colour waits for the submit attempt.
+
+_The conflict borders land where they were asked for._ Overlapping sessions are not flagged on Step
+2 during selection; they surface as a Step 4 error, and only then do the offending Step 2 cards take
+`card-edge-danger`. Because that edge is an inset shadow like the others, a conflicted card still
+measures exactly 162px — the error state shifts nothing.
+
+_The success screen follows the mockup, not my reading of the README._ The README asks for a
+confirmation screen "with a summary" and the design's frame has none, so I first built an itemised
+recap of ticket, sessions, add-ons and total paid, on the grounds that source precedence puts the
+README above the mockup. Reviewed and reversed: the frame is the intended design, and the screen
+already carries the substance of a summary — the confirmation code, and a body line naming the
+ticket type, the event and the destination email. The itemised breakdown belongs on Step 4, which
+the user reaches immediately before this and can return to. Precedence resolves conflicts of fact;
+it does not license padding a deliberately spare screen.
+
+The confirmation prefix is `WDS2028` rather than the frame's `TC2025`, which is the same stale
+TechConf branding as its "WebDev Summit 2025" header.
+
+_A bug the wizard root has now hit twice._ `useValidation` initially injected the registration
+state, which throws in `RegistrationWizard` — the component that provides it. `useStepper` already
+carries the same optional-injection parameter for the same reason; the second occurrence suggests
+any composable reading this state should take it, so Phase 6 should not rediscover this a third
+time.
 
 ---
 

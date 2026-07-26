@@ -7,10 +7,22 @@ const props = defineProps({
     default: 'primary',
     validator: (value) => ['primary', 'secondary'].includes(value),
   },
+  size: {
+    type: String,
+    default: 'md',
+    validator: (value) => ['md', 'lg'].includes(value),
+  },
   type: { type: String, default: 'button' },
   disabled: { type: Boolean, default: false },
   loading: { type: Boolean, default: false },
 })
+
+// The design gives the final submit a 48px button in an 80px action bar, against 40px in 72px
+// everywhere else.
+const SIZE_CLASSES = {
+  md: 'px-4 py-2.5',
+  lg: 'px-6 py-3.5',
+}
 
 const VARIANT_CLASSES = {
   primary:
@@ -28,8 +40,8 @@ const isInteractive = computed(() => !props.disabled && !props.loading)
     :type="type"
     :disabled="!isInteractive"
     :aria-busy="loading || undefined"
-    class="inline-flex min-w-[72px] items-center justify-center gap-2 rounded px-4 py-2.5 text-[14px] leading-5 font-semibold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50"
-    :class="variantClasses"
+    class="inline-flex min-w-[72px] items-center justify-center gap-2 rounded text-[14px] leading-5 font-semibold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50"
+    :class="[variantClasses, SIZE_CLASSES[size]]"
   >
     <span
       v-if="loading"
