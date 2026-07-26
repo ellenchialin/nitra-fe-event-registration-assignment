@@ -27,6 +27,18 @@ export default {
       merchandise: '周邊商品',
     },
     conflictsWith: '與 {sessions} 時間衝突',
+    addedToOrder: '已加入訂單',
+    size: '尺寸：',
+    selectSize: '請選擇',
+    sizeFor: '{name} 的尺寸',
+    quantity: '數量：',
+    maxQuantity: '最多 {count}',
+    decreaseFor: '減少 {name} 的數量',
+    increaseFor: '增加 {name} 的數量',
+    shipping: {
+      title: '寄送資訊',
+      body: '周邊商品將於會議前一週寄送至您填寫的地址，請確認第 1 步的寄送地址正確無誤。',
+    },
   },
   summary: {
     title: '訂單明細',

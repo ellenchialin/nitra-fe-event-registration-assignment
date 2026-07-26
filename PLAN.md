@@ -24,7 +24,7 @@ not cosmetic.
 | 1     | Foundation — `utils/` (time, currency, validators), `useRegistration` state          | 1h   | ✅ Done       |
 | 2     | Wizard shell + stepper, Step 1 — ticket cards, attendee form, `FormField`            | 1.5h | ✅ Done       |
 | 3     | Step 2 — day tabs, session grid, capacity bars, conflict detection                   | 1h   | ✅ Done       |
-| 4     | Step 3 — category tabs, workshop conflicts, size/qty, shipping banner, order summary | 1.5h | ▢ Not started |
+| 4     | Step 3 — category tabs, workshop conflicts, size/qty, shipping banner, order summary | 1.5h | ✅ Done       |
 | 5     | Step 4 — review cards, unified validation, error navigation, submit + success        | 1h   | ▢ Not started |
 | 6     | Polish — interactive states, transitions, responsive, URL sync                       | 1h   | ▢ Not started |
 | 7     | i18n pass + this document                                                            | 1h   | ▢ Not started |
@@ -156,7 +156,62 @@ own children account for exactly 288, every ancestor in the chain is fully accou
 detached clone of the row at the same 1200px width measures exactly 288 — yet the live row is 16px
 taller, and neither `flex-wrap: nowrap`, a zeroed row gap, `fit-content`, nor `align-items:
 flex-start` changes it. It is cosmetic and stable across selections, so it is parked rather than
-papered over with a hardcoded height.
+papered over with a hardcoded height. **Resolved in Phase 4** — see the `.flex` collision below.
+
+---
+
+**Phase 4 — Step 3** ✅ `d832858` `fab897a` `71a3729`
+
+Category tabs, add-on cards, workshop conflicts, merchandise controls, and the live order summary.
+Geometry matches frame `1073:899` exactly: the 1200px content column splits 788 / 32 / 380, the
+workshop cards are 120px, and the order summary is 380×211 rendering `$599.00 + $149.00 − $14.90 =
+$733.10` — the design's own numbers, arrived at independently.
+
+_Unavailability is derived, not enforced._ The README asks that a workshop overlapping a selected
+session be marked unavailable. Rather than watch the session selection and delete the add-on,
+`unavailableAddonIds` is a `computed` over sold-out state and schedule overlap, and both
+`selectedAddonLines` and `setAddonQuantity` respect it. A workshop that a later session choice puts
+out of reach silently stops counting toward the total, and returns intact if that session is
+dropped. That keeps the "derived state is computed, never watch" rule honest and makes the
+back-and-forth non-destructive, which is the behaviour a user navigating freely between steps
+expects.
+
+_A shared card, until it stopped being shared._ Workshops and meal packages are the same card with
+optional rows, so one `AddonCard` renders both — a meal simply has no schedule or capacity line.
+Merchandise is a different component: its card is not a button, because it contains its own
+controls, and selection is expressed by quantity rather than by clicking the card. The design backs
+this up, giving merchandise the "✓ Added to order" line that workshops do not have.
+
+I did briefly extract a shared `CapacityLabel` for the session and workshop cards, then reverted
+it. The two surfaces disagree on both wording ("spots left" vs "spots remaining") and colour
+(banded against the bar vs a flat `text/neutral/quiet`), so the shared component was two components
+wearing a trench coat.
+
+_The `.flex` collision — and the 16px._ Quasar ships `.row, .column, .flex { display: flex;
+flex-wrap: wrap }`, while UnoCSS's `.flex` sets `display` only. Quasar's stylesheet loads first but
+nothing later restores the default, so **every `flex` in this app silently wrapped**. It surfaced on
+the shipping banner, whose icon and text block broke onto separate lines, and the fix is a preflight
+in `uno.config.js` — the same place, and the same reasoning, as the border reset already there. The
+`flex-wrap-*` utilities are emitted after preflights, so deliberate wrapping still works.
+
+This also closes the Phase 3 mystery: the ticket-card row was wrapping, and the extra line box was
+the 16px. It now measures exactly 288. Worth recording that the earlier `flex-wrap: nowrap` probe
+was run as an inline style on the row rather than on the wrapping ancestor, which is why it came
+back negative and sent the investigation down a dead end.
+
+_Groundwork for V3._ A size only matters once the item is actually in the order, so
+`merchandiseMissingSize` reads the priced lines rather than every sized product — a t-shirt sized
+"M" and then decremented to zero is not an error. Phase 5's rule array consumes it directly.
+
+_Where the design and the platform disagree._ The size control is a native `<select>`, which sizes
+itself to its widest option — 74px against the design's 45px for a chosen "M". Matching the design
+exactly means a custom listbox: a popup, focus management, and type-ahead, all to save 29px on a
+control that already has correct keyboard and mobile behaviour. Not worth it here, and flagged
+rather than hidden.
+
+The merchandise frame (`1149:565`) also draws its text at 19/15/13px line boxes where the workshop
+frame uses 20/16/14 — so merchandise cards render 134px against the frame's 131. The typography
+tokens match the primary frame exactly; the secondary frame is the inconsistency §3 warns about.
 
 ---
 
@@ -243,6 +298,15 @@ never trigger.
 **Capacity applies to add-ons too.** The README only mentions capacity checks for sessions, but
 workshops carry `capacity`/`registered` as well, and `ws2` is full. The design confirms this — it
 renders "Sold Out" on that card. Handled for both.
+
+**One product name contradicts its own options.** `merch4` ships as `Laptop Sleeve (15")` while
+offering `13"` / `15"` / `16"` — the name pins a size the selector then asks the user to choose,
+and a cart line reading `Laptop Sleeve (15") — 13"` is simply wrong. The Figma frame reproduces the
+same string, so this is an inconsistency in the source rather than one introduced here. I renamed
+it to `Laptop Sleeve` in `mocks/addons.js`, which is the honest place to fix it: stripping a
+parenthetical at the display boundary would be a frontend quietly rewriting product names, and
+the regex would eventually eat a parenthetical that mattered. Recorded here because editing a
+provided fixture should be a visible decision, not silent drift.
 
 **Timezone.** Every timestamp is UTC (`Z`). In UTC+8 local time, `ws2` runs 23:30 → 02:30 _the next
 day_, so naive `Date#getDate()` grouping would file it under the wrong day and could produce

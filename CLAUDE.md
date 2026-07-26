@@ -70,6 +70,9 @@ specification.
   `flex-wrap: nowrap` for `.flex`; do not remove it, and keep using `flex-wrap` where wrapping is
   intended (utilities are emitted after preflights and still win). `.row` and `.column` carry the
   same rule — avoid those class names entirely.
+- **Figma's surface ramp is inverted relative to the starter's.** Figma's `bg/surface/l0` is the
+  grey base (`#F4F5F6`), which the starter holds in `bg-surface-l1`; the starter's `l0` is white.
+  Same trap as the brand ramp: look the hex up, never copy the name.
 - The Figma variable `bg/disable` returns the string `"50"`, not a colour. Use the starter's
   `bg-disable` token.
 - Capacity applies to add-ons as well as sessions (`ws2` is 25/25 and sold out), though the README

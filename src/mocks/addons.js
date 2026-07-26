@@ -77,7 +77,7 @@ export const addons = [
   {
     id: 'merch4',
     category: 'merchandise',
-    name: 'Laptop Sleeve (15")',
+    name: 'Laptop Sleeve',
     description: 'Neoprene sleeve with conference branding.',
     price: 42,
     sizes: ['13"', '15"', '16"'],

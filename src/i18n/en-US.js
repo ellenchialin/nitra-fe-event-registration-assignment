@@ -24,6 +24,18 @@ export default {
       merchandise: 'Merchandise',
     },
     conflictsWith: 'Time conflict with {sessions}',
+    addedToOrder: 'Added to order',
+    size: 'Size:',
+    selectSize: 'Select',
+    sizeFor: 'Size for {name}',
+    quantity: 'Qty:',
+    maxQuantity: 'max {count}',
+    decreaseFor: 'Decrease quantity of {name}',
+    increaseFor: 'Increase quantity of {name}',
+    shipping: {
+      title: 'Shipping Information',
+      body: 'Merchandise items will be shipped to your address one week before the conference. Please ensure your shipping address in Step 1 is correct.',
+    },
   },
   summary: {
     title: 'Order Summary',
