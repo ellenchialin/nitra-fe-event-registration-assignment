@@ -34,7 +34,7 @@ const dayTabs = computed(() =>
       {{ $t('step2.selectedCount', selectedSessionIds.length) }}
     </p>
 
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 gap-4 tablet:grid-cols-2">
       <SessionCard
         v-for="session in activeDaySessions"
         :key="session.id"

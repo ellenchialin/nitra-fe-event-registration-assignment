@@ -11,7 +11,7 @@ const model = defineModel({ type: String, default: '' })
   <div
     role="tablist"
     :aria-label="ariaLabel"
-    class="flex w-fit shrink-0 gap-1 self-start rounded bg-surface-l2 p-1"
+    class="flex w-fit max-w-full shrink-0 flex-wrap gap-1 self-start rounded bg-surface-l2 p-1"
   >
     <button
       v-for="tab in tabs"

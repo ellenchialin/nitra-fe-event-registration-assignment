@@ -33,7 +33,7 @@ const showsMerchandise = computed(() => activeCategory.value === ADDON_CATEGORY.
 </script>
 
 <template>
-  <div class="flex items-start gap-8">
+  <div class="flex flex-col gap-8 desktop:flex-row desktop:items-start">
     <div class="flex min-w-0 flex-1 flex-col gap-6">
       <h2 class="text-h3 text-neutral">{{ $t('step3.title') }}</h2>
 
@@ -71,6 +71,6 @@ const showsMerchandise = computed(() => activeCategory.value === ADDON_CATEGORY.
       </template>
     </div>
 
-    <OrderSummary class="sticky top-24 w-95 shrink-0" />
+    <OrderSummary class="w-full desktop:sticky desktop:top-24 desktop:w-95 desktop:shrink-0" />
   </div>
 </template>

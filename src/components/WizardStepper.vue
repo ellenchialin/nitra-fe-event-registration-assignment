@@ -57,8 +57,10 @@ const LABEL_CLASSES = {
           <template v-else>{{ step.number }}</template>
         </span>
 
+        <!-- Four labelled nodes plus connectors do not fit a phone; below tablet the labels are
+             dropped to the accessibility layer and the numbered circles carry the progress. -->
         <span class="text-[13px]" :class="LABEL_CLASSES[step.status]">
-          {{ $t(`steps.${step.key}`) }}
+          <span class="sr-only tablet:not-sr-only">{{ $t(`steps.${step.key}`) }}</span>
           <span class="sr-only">
             {{ $t('a11y.stepOf', { number: step.number, total: TOTAL_STEPS, label: '' }) }}
           </span>
