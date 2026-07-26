@@ -57,6 +57,24 @@ export function schedulesOverlap(a, b) {
 }
 
 /**
+ * Every pair of scheduled records that overlap in time, each pair listed once.
+ *
+ * @param {Array<{date?: string, endDate?: string}>} records - Scheduled records to compare.
+ * @returns {Array<Array<object>>} Overlapping pairs as `[a, b]` tuples, in input order.
+ */
+export function overlappingPairs(records = []) {
+  const pairs = []
+
+  for (let i = 0; i < records.length; i += 1) {
+    for (let j = i + 1; j < records.length; j += 1) {
+      if (schedulesOverlap(records[i], records[j])) pairs.push([records[i], records[j]])
+    }
+  }
+
+  return pairs
+}
+
+/**
  * Derives a stable UTC calendar-day key for grouping.
  *
  * @param {string} isoTimestamp - ISO 8601 timestamp.

@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 import { sessions } from '../mocks/sessions.js'
-import { groupByUtcDay, schedulesOverlap } from '../utils/time.js'
+import { groupByUtcDay, overlappingPairs, schedulesOverlap } from '../utils/time.js'
 import { useRegistration } from './useRegistration.js'
 
 /**
@@ -35,18 +35,7 @@ export function useSessions() {
   }
 
   /** Every pair of selected sessions that overlap, each pair listed once. */
-  const conflictingPairs = computed(() => {
-    const selected = selectedSessions.value
-    const pairs = []
-
-    for (let i = 0; i < selected.length; i += 1) {
-      for (let j = i + 1; j < selected.length; j += 1) {
-        if (schedulesOverlap(selected[i], selected[j])) pairs.push([selected[i], selected[j]])
-      }
-    }
-
-    return pairs
-  })
+  const conflictingPairs = computed(() => overlappingPairs(selectedSessions.value))
 
   return {
     dayGroups,
