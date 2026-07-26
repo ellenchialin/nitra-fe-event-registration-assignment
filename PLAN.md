@@ -116,7 +116,7 @@ wrong thing" problem, with noticeably worse momentum scrolling on iOS. The heade
 left to scroll away: pinning it too would cost 153px of permanent chrome, 17% of a 900px viewport
 before the action bar's 72px, and it carries only branding and the locale switcher.
 
-**Phase 3 — Step 2** ✅ `643787c` `8816c8a` `2aa300b`
+**Phase 3 — Step 2** ✅ `643787c` `8816c8a` `39f27da`
 
 Day tabs, the session grid, and capacity bars. Card geometry matches frame `1072:912` exactly —
 592×162 with 16px gaps, child heights 20/20/16/14/28.
@@ -160,7 +160,7 @@ papered over with a hardcoded height. **Resolved in Phase 4** — see the `.flex
 
 ---
 
-**Phase 4 — Step 3** ✅ `d832858` `fab897a` `71a3729`
+**Phase 4 — Step 3** ✅ `d832858` `fab897a` `c5ae2f2`
 
 Category tabs, add-on cards, workshop conflicts, merchandise controls, and the live order summary.
 Geometry matches frame `1073:899` exactly: the 1200px content column splits 788 / 32 / 380, the
