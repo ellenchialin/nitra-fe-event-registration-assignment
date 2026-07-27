@@ -13,7 +13,7 @@ const props = defineProps({
 
 defineEmits(['toggle'])
 
-const { dayAndTimeRange, priceShort } = useFormatters()
+const { currency, dayAndTimeRange } = useFormatters()
 
 const textClass = computed(() => (props.unavailable ? 'text-neutral-disabled' : null))
 const conflictTitles = computed(() => props.conflicts.map((session) => session.title).join(', '))
@@ -46,7 +46,7 @@ const capacityClass = computed(() => {
     <span class="flex items-start justify-between gap-4">
       <span class="text-subtitle1" :class="textClass ?? 'text-neutral'">{{ addon.name }}</span>
       <span class="text-subtitle1 shrink-0" :class="textClass ?? 'text-neutral'">
-        {{ priceShort(toCents(addon.price)) }}
+        {{ currency(toCents(addon.price)) }}
       </span>
     </span>
 

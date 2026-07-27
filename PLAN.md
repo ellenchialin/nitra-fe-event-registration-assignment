@@ -621,6 +621,18 @@ in `typography.scss` and referenced from both the theme and `body`, giving it on
 `bg/disable` comes back as the string `"50"` rather than a colour — a broken variable in the source
 file. I use `bg-disable` from the starter tokens instead.
 
+**Currency format: scoped to where the README asks.** README §Step 3.6 requires all prices as
+`$X,XXX.XX`, and the add-on cards were rendering `$149` — the design's short form, which
+`formatPriceShort` exists to produce. Precedence puts the README above the mockup, so the add-on
+cards now render `$149.00`.
+
+Deliberately **not** applied site-wide, despite "all prices" reading absolute. The requirement sits
+inside the Step 3 list, and the README's own ticket table writes `$299`, `$599`, `$99` without
+decimals — so a global reading would breach one part of the README to satisfy another. Ticket cards
+keep the short form, which both the README's table and the design agree on, and Step 4's row values
+keep it too since that section states no format requirement. The Step 3 screen gains coherence
+either way: its cards and its order summary now print the same figure the same way.
+
 ---
 
 ## 4. Key decisions

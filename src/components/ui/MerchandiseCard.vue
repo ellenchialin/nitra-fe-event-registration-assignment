@@ -12,7 +12,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:quantity', 'update:size'])
 
-const { priceShort } = useFormatters()
+const { currency } = useFormatters()
 
 const selected = computed(() => props.selection.quantity > 0)
 
@@ -31,7 +31,7 @@ const needsSize = computed(
     <div class="flex items-start justify-between gap-4">
       <h3 class="text-subtitle1 text-neutral">{{ addon.name }}</h3>
       <span class="text-subtitle1 shrink-0 text-neutral">
-        {{ priceShort(toCents(addon.price)) }}
+        {{ currency(toCents(addon.price)) }}
       </span>
     </div>
 
