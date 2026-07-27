@@ -678,11 +678,13 @@ keeps ownership explicit, allows a clean reset after submission, and satisfies t
 "composable or provide/inject" from both directions.
 
 **Derived state is `computed`, never watched.** Conflicts, availability, totals, capacity bands and
-the error map are all pure functions of `(mock data, selections)`. The codebase ends up with **no
-`watch` at all**: the one case that would have justified one — syncing the step to the URL, where
-the target is genuinely external state — was cut in Phase 6, so the rule holds without an
-exception. If a watcher ever becomes necessary it should be for external state and annotated as
-such, not for anything derivable.
+the error map are all pure functions of `(mock data, selections)`, so none of them is watched.
+
+There is exactly **one `watch` in the codebase**, and it is the shape the rule allows: a
+`watchEffect` in `src/boot/i18n.js` writing `document.documentElement.lang` from the active locale.
+The target is a DOM attribute — state outside Vue's reactivity graph, which no `computed` can
+express. It is annotated in place as such. The other candidate, syncing the step to the URL, was
+cut in Phase 6 precisely because that state _was_ derivable.
 
 **Validation as a declarative rule set.** An array of `{ step, field, validate, message }` rather
 than imperative checks scattered across components. `errorsByStep` becomes one `computed` reduction,
@@ -804,11 +806,24 @@ from it, so the woff2 itself never is — reaching for `QIcon` here would have p
 for a single symbol. Inlining matches what `BrandMark` and `CircleCheckIcon` already do, and takes
 `currentColor`. **That config entry is now dead weight and should be dropped.**
 
-One pre-existing gap this surfaced, unrelated to the swap: nothing ever updates `<html lang>`.
-Quasar's Lang pack sets it to `en-US` at boot and it never follows `vue-i18n`, so the document still
-claims English while rendering Chinese — which changes how a screen reader pronounces the page. The
-old `<select>` had the same hole, so it is not a regression, but it is the one place where syncing
-genuinely external state would justify the app's only watcher.
+One pre-existing gap this surfaced, unrelated to the swap: nothing ever updated `<html lang>`.
+Quasar's Lang plugin does `el.setAttribute('lang', lang.isoName)` from its default `en-US` pack and
+never follows `vue-i18n`, so the document claimed English while rendering Chinese. The old
+`<select>` had the same hole, so it was not a regression — but it is a **WCAG 3.1.1 (Level A)**
+failure, and the practical effect is that a screen reader hands `選擇加購項目` to an English voice,
+which makes the whole zh-TW locale unusable non-visually. Shipping i18n as a nice-to-have and then
+leaving one locale unreadable is half the feature.
+
+Fixed with the `watchEffect` described in §4. The ordering mattered and was worth proving rather
+than assuming: Quasar sets the attribute during framework init, so a boot-file write only survives
+if boot runs afterwards. A cold load with `DEFAULT_LOCALE` temporarily flipped to `zh-TW` settled it
+— the attribute came up `zh-TW`, so boot wins. Verified `en-US` → `zh-TW` → `en-US` through the real
+control.
+
+The Han-unification argument for `lang` — that CJK glyph shapes differ by language tag — I could not
+substantiate here: flipping the attribute changed neither the rendering nor the measured width
+(327px both ways), because macOS resolves both cases to the same fallback face. It may well matter
+on Windows. The case rests on the screen-reader failure, which is verified.
 
 Would I choose this stack greenfield? No — plain Vite + Vue + UnoCSS gives the same tooling without
 a second CSS baseline to fight. But the starter is the starting point the brief specifies, and
