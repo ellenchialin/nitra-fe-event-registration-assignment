@@ -34,8 +34,9 @@ specification.
   `Intl.DateTimeFormat(..., { timeZone: 'UTC' })`. Never `getDate()`/`getHours()` — mock timestamps
   are `Z` and local-time conversion shifts `ws2` across a day boundary.
 - **Money is integer cents.** Format only at the display boundary via `utils/currency.js`.
-- **Derived state is `computed`, never `watch`.** The single legitimate watcher is the URL step sync
-  (external state); annotate it as such.
+- **Derived state is `computed`, never `watch`.** There are currently **no watchers at all** — the
+  one case that would have justified one (URL step sync) was cut. If you add one it must be for
+  genuinely external state, and annotated as such.
 - **No user-facing string literals.** All copy goes through `vue-i18n` keys (`en`, `zh-TW`).
 - **JSDoc on every exported function** — params, return, and non-obvious behaviour.
 - Render all event copy from `src/mocks/event.js`. Never hardcode the event name (the design's

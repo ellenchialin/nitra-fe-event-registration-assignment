@@ -26,7 +26,7 @@ not cosmetic.
 | 3     | Step 2 — day tabs, session grid, capacity bars, conflict detection                   | 1h   | ✅ Done       |
 | 4     | Step 3 — category tabs, workshop conflicts, size/qty, shipping banner, order summary | 1.5h | ✅ Done       |
 | 5     | Step 4 — review cards, unified validation, error navigation, submit + success        | 1h   | ✅ Done       |
-| 6     | Polish — interactive states, transitions, responsive, URL sync                       | 1h   | ▢ Not started |
+| 6     | Polish — responsive layout, interactive states, entry motion                         | 1h   | ✅ Done       |
 | 7     | i18n pass + this document                                                            | 1h   | ▢ Not started |
 | 8     | Acceptance pass — scenarios below, clean-checkout smoke test                         | 0.5h | ▢ Not started |
 
@@ -269,6 +269,46 @@ carries the same optional-injection parameter for the same reason; the second oc
 any composable reading this state should take it, so Phase 6 should not rediscover this a third
 time.
 
+**Phase 6 — Polish** ✅ `2a8a7d8` `ba1d2dd` `e677e64` `cb90b79` `f9a1212`
+
+Responsive layout, interactive states and entry motion. URL sync was scoped here and deliberately
+cut — see §8.
+
+_Responsive._ Every step had assumed the 1200px column. Step 3 was the worst: its two-column layout
+could not stack, squeezing the add-on list until the heading broke one character per line. Worth
+recording that the `.flex` preflight from Phase 4 is what exposed this — removing Quasar's
+`flex-wrap: wrap` stopped rows from stacking by accident, so the fix made the missing breakpoints
+visible rather than causing them.
+
+The header gutter needed more than a breakpoint. Its padding is
+`clamp(24px, calc((100% - 1200px) / 2), 48px)` — the content column's own gutter formula, floored at
+the page gutter and capped at the design's 48px. No single breakpoint works: between 1248px and
+1296px the column's gutter slides from 24 to 48, so a fixed padding drifts against it, and at 1280 —
+a common laptop width — the header sat at 48 against content at 40. The percentage resolves against
+the containing block rather than `100vw`, so a classic scrollbar cannot skew the alignment.
+
+_Motion, and how it is verified._ The stepper's connector fill grows along its track, and the
+success badge springs in with a ripple before the tick draws itself. Both are CSS animations rather
+than Vue transitions, for a specific reason: `<Transition>` advances through `requestAnimationFrame`,
+which a backgrounded tab suspends. A cross-fade I tried on the stepper's number-to-check swap
+stranded the old glyph in `v-leave-from` indefinitely, so it was removed; CSS animations run on the
+document timeline and have no such dependency.
+
+This phase also corrected how I verify animation. Sampling geometry after a `setTimeout` produced
+two wrong conclusions in a row, because the automation surface reports `document.hidden === true` —
+transitions do not advance there, so every sample lands on the end state and looks like a snap. On
+that evidence I wrote a confident comment blaming UnoCSS's `scale-x-*` custom properties, then
+tested the claim directly and found it false. Inspecting `getAnimations()` is the reliable check: it
+reports the transition object whether or not frames are being produced. The original diagnosis did
+survive that test — `width: 0` to `width: 100%` registers no animation at all, which is why the fill
+is a transform.
+
+_Two things deleted rather than shipped._ A capture-phase click guard on the submit button, added to
+avoid Quasar dimming the spinner via `[disabled] { opacity: .6 !important }` — the native `disabled`
+attribute blocks mouse, keyboard and programmatic activation for free, and a dimmed busy button is
+the conventional look. And an `aria-disabled` alongside it, which merely restates what the native
+attribute already exposes.
+
 ---
 
 ## 1a. How this is verified
@@ -286,7 +326,8 @@ testing `s2`&`s3` would prove nothing, since `s2` can never be selected.
 
 - N1 — Walk 1 → 2 → 3 → 4, then back to 1. Every field, ticket, session and add-on survives.
 - N2 — Jump between steps via the stepper, not just the footer buttons.
-- N3 — Browser Back moves a step rather than leaving the app (once URL sync lands, Phase 6).
+- N3 — _Dropped._ Browser Back leaves the app rather than stepping back, because URL sync was cut
+  in Phase 6. Recorded as a known limitation in §8 rather than as a scenario that passes.
 
 **Data rendering**
 
@@ -585,9 +626,11 @@ keeps ownership explicit, allows a clean reset after submission, and satisfies t
 "composable or provide/inject" from both directions.
 
 **Derived state is `computed`, never watched.** Conflicts, availability, totals, capacity bands and
-the error map are all pure functions of `(mock data, selections)`. The only `watch` in the codebase
-is the URL sync, where the target is genuinely external state — a case where a watcher is correct
-rather than lazy. I annotate that one so the distinction is visible.
+the error map are all pure functions of `(mock data, selections)`. The codebase ends up with **no
+`watch` at all**: the one case that would have justified one — syncing the step to the URL, where
+the target is genuinely external state — was cut in Phase 6, so the rule holds without an
+exception. If a watcher ever becomes necessary it should be for external state and annotated as
+such, not for anything derivable.
 
 **Validation as a declarative rule set.** An array of `{ step, field, validate, message }` rather
 than imperative checks scattered across components. `errorsByStep` becomes one `computed` reduction,
@@ -615,14 +658,44 @@ not per line item, so the itemised breakdown always reconciles against the grand
 The starter ships Vue, Quasar, vue-router and UnoCSS. My default position was to add nothing and
 justify each exception.
 
-| Dependency                   | Verdict        | Reasoning                                                                                                                                                                                                                                                               |
-| ---------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `vue-i18n`                   | **Added**      | i18n is a listed nice-to-have. It only stays cheap if strings are keyed from the first commit; retrofitting an extraction pass across 15 components is where this turns into hours. Also routes date/currency formatting through one locale-aware layer instead of two. |
-| Inter Variable (self-hosted) | **Added**      | The design is set in Inter at variable weights and the starter loads no font. Self-hosted rather than a Google Fonts CDN link so a clean checkout works offline and there is no render-blocking third-party request.                                                    |
-| `date-fns` / `dayjs`         | **Rejected**   | `Intl.DateTimeFormat` with `timeZone: 'UTC'` covers every formatting case here, and overlap detection is a two-line numeric comparison on epoch millis. A date library would add weight to avoid roughly 20 lines of standard-library code.                             |
-| `lodash-es`                  | **Rejected**   | Grouping is a four-line `reduce`. Not worth a dependency.                                                                                                                                                                                                               |
-| Pinia                        | **Rejected**   | The rubric explicitly asks for composable or `provide`/`inject` state. A store library would sidestep the thing being assessed, for a single-screen wizard that never needs cross-route persistence.                                                                    |
-| `vitest`                     | **Considered** | Test coverage is explicitly not evaluated. If time allows I would add a small suite over `rangesOverlap` and the pricing reducer — the two functions where an off-by-one is both plausible and invisible in the UI.                                                     |
+| Dependency                   | Verdict                       | Reasoning                                                                                                                                                                                                                                                               |
+| ---------------------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `vue-i18n`                   | **Added**                     | i18n is a listed nice-to-have. It only stays cheap if strings are keyed from the first commit; retrofitting an extraction pass across 15 components is where this turns into hours. Also routes date/currency formatting through one locale-aware layer instead of two. |
+| Inter Variable (self-hosted) | **Added**                     | The design is set in Inter at variable weights and the starter loads no font. Self-hosted rather than a Google Fonts CDN link so a clean checkout works offline and there is no render-blocking third-party request.                                                    |
+| `date-fns` / `dayjs`         | **Rejected**                  | `Intl.DateTimeFormat` with `timeZone: 'UTC'` covers every formatting case here, and overlap detection is a two-line numeric comparison on epoch millis. A date library would add weight to avoid roughly 20 lines of standard-library code.                             |
+| `lodash-es`                  | **Rejected**                  | Grouping is a four-line `reduce`. Not worth a dependency.                                                                                                                                                                                                               |
+| Pinia                        | **Rejected**                  | The rubric explicitly asks for composable or `provide`/`inject` state. A store library would sidestep the thing being assessed, for a single-screen wizard that never needs cross-route persistence.                                                                    |
+| `quasar`                     | **Kept, but only as tooling** | Audited in Phase 6: zero `<q-*>` components, zero imports from the package, no utility classes, `framework.plugins` empty. See below.                                                                                                                                   |
+| `vitest`                     | **Considered**                | Test coverage is explicitly not evaluated. If time allows I would add a small suite over `rangesOverlap` and the pricing reducer — the two functions where an off-by-one is both plausible and invisible in the UI.                                                     |
+
+_What Quasar actually earns its place doing._ The audit is stark: **27 bespoke components, zero
+Quasar ones.** Nothing imports from the `quasar` package, no `q-` utility class appears in any
+template, and no plugins are enabled. What the framework provides here is `@quasar/app-vite` — the
+build, the dev server, the boot-file convention — plus the `--q-*` colour aliases the starter wired
+into `colors.scss`.
+
+Its components went unused because the design is a specific token system with exact values, and
+Quasar's are opinionated: matching `162px` session cards, a `48px` submit in an `80px` bar, and
+Figma's own `#3A7679` link colour means overriding a Q-component's internals until little of it
+remains. Writing a small component against the token set is less code than defeating one.
+
+That is not a free ride. Quasar's global stylesheet caused five bugs, each found by measuring
+rather than reading:
+
+1. `border-style` defaulting to `none`, so every semantic `border-*` shortcut was inert (Phase 2)
+2. `p { margin: 0 0 16px }`, adding spacing the auto-layout design does not have (Phase 2)
+3. `.text-accent` / `.text-info` / `.text-warning` defined with `!important`, silently rendering
+   Quasar's palette instead of the design's (Phase 3)
+4. `.row, .column, .flex { flex-wrap: wrap }`, which made every flex row in the app wrap (Phase 4)
+5. `.disabled, [disabled] { opacity: .6 !important }`, dimming the submit button's spinner (Phase 6)
+
+Each is now fixed by a preflight in `uno.config.js` or recorded in CLAUDE.md so it does not recur.
+
+Would I choose this stack greenfield? No — plain Vite + Vue + UnoCSS gives the same tooling without
+a second CSS baseline to fight. But the starter is the starting point the brief specifies, and
+removing Quasar at Phase 6 would rewrite the build config, the boot files and the documented
+commands in order to delete bugs that are already fixed and documented. The cost is behind us; the
+risk of the swap would not be.
 
 ---
 
@@ -653,7 +726,11 @@ correcting.
   button silently discards the entire form. It also caught the failure mode most implementations
   hit, where `router.replace` produces a correct-looking URL and a Back button that still exits the
   app. The reversal only happened because I asked it to justify the recommendation rather than
-  accepting the first answer.
+  accepting the first answer. The postscript matters too: when I later asked it to argue the case
+  properly, it conceded that most of what it had cited — deep linking, refresh resilience — did not
+  hold for an app that persists nothing, leaving one real argument. The feature was cut on that
+  narrowed basis. Both the reversal and the retraction came from asking for reasoning rather than a
+  verdict.
 - _It over-trusted the mockup as specification._ Early reads treated the Step 2 frame as
   authoritative, which would have meant blocking conflicting sessions — directly contrary to the
   README. The frame is internally inconsistent (one conflicting session greyed, another not; a
@@ -683,10 +760,19 @@ belongs.
 
 ## 8. What I would improve with more time
 
-- **Persist state to `sessionStorage`.** It pairs naturally with URL sync — a hard refresh on
-  `?step=3` currently clamps back to Step 1. I left it out deliberately: it drags in rehydration and
-  schema-versioning concerns for a case (refresh mid-registration) that is unlikely to be exercised,
-  and a half-working persistence layer is worse than none.
+- **Sync the step to the URL, and only then persist state.** Cut from Phase 6 after arguing it
+  through. Most of the usual justifications do not apply here: `?step=3` carries no state, so it is
+  not shareable, and nothing is persisted, so a refresh loses the form either way. One argument does
+  survive — the wizard advertises its steps as navigable places, with a stepper, a Back button and
+  preserved state, while the browser has only ever seen one location. Pressing Back, the most
+  conventional way to say "go back", therefore exits the app and discards a filled form. That is the
+  UI creating an expectation it then breaks, and it is the reason to build this first if the work
+  resumed. It was cut because responsive layout and the acceptance pass carry more weight against
+  the rubric, and a broken mobile layout costs more than a Back button that leaves.
+- **Persist state to `sessionStorage`.** The natural pair to the above: it does not stop Back from
+  leaving, but it makes the departure non-destructive. Left out deliberately — it drags in
+  rehydration and schema-versioning concerns for a case unlikely to be exercised in review, and a
+  half-working persistence layer is worse than none.
 - **Unit tests** over `rangesOverlap`, the capacity-band thresholds, and the pricing reducer.
 - **Virtualise the session grid** if the dataset grew — irrelevant at 12 sessions, relevant at 200.
 - **Fuller a11y pass** — the cards are checkbox/radio groups and want proper roving focus and
