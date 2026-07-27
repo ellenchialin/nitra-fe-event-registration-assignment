@@ -106,9 +106,33 @@ export function createRegistrationState() {
   function toggleSession(sessionId) {
     if (isSessionSelected(sessionId)) {
       selectedSessionIds.value = selectedSessionIds.value.filter((id) => id !== sessionId)
-    } else {
-      selectedSessionIds.value = [...selectedSessionIds.value, sessionId]
+      return
     }
+
+    selectedSessionIds.value = [...selectedSessionIds.value, sessionId]
+    dropAddonsClashingWith(sessionById.get(sessionId))
+  }
+
+  /**
+   * Drops any selected add-on that overlaps the given session.
+   *
+   * Availability stays derived, but the selection cannot: a filtered-out add-on still reads as
+   * selected in state while the card and the order summary both show it gone, and it would
+   * silently return to the total when the clash cleared. Pruning here rather than in a watcher
+   * keeps the removal attributable to the click that caused it.
+   *
+   * @param {{date?: string, endDate?: string}} [session] - Session that was just added.
+   * @returns {void}
+   */
+  function dropAddonsClashingWith(session) {
+    if (!session) return
+
+    const next = { ...addonSelections.value }
+    const clashing = Object.keys(next).filter((id) => schedulesOverlap(addonById.get(id), session))
+    if (clashing.length === 0) return
+
+    for (const id of clashing) delete next[id]
+    addonSelections.value = next
   }
 
   /**
@@ -133,10 +157,13 @@ export function createRegistrationState() {
    */
   function setAddonQuantity(addonId, quantity) {
     const addon = addonById.get(addonId)
-    if (!addon || unavailableAddonIds.value.has(addonId)) return
+    if (!addon) return
 
     const maximum = addon.maxQuantity ?? 1
     const clamped = Math.min(Math.max(Math.trunc(quantity) || 0, 0), maximum)
+
+    // Unavailability blocks adding, never removing — otherwise a selection could get stuck.
+    if (clamped > 0 && unavailableAddonIds.value.has(addonId)) return
     const next = { ...addonSelections.value }
 
     if (clamped === 0) {
@@ -161,7 +188,8 @@ export function createRegistrationState() {
   /**
    * Records the chosen size for a sized merchandise item.
    *
-   * Stored even at quantity zero, so a size chosen before the quantity is raised survives.
+   * Held on the selection record, so a size chosen before the quantity is raised survives. Taking
+   * the quantity back to zero removes the item from the order and discards it with the record.
    *
    * @param {string} addonId - Add-on identifier.
    * @param {string|null} size - Chosen size, or `null` to clear it.

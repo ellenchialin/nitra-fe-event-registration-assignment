@@ -27,6 +27,7 @@ export default {
     addedToOrder: 'Added to order',
     size: 'Size:',
     selectSize: 'Select',
+    sizeRequired: 'Choose a size to complete this item',
     sizeFor: 'Size for {name}',
     quantity: 'Qty:',
     maxQuantity: 'max {count}',

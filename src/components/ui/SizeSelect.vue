@@ -2,6 +2,8 @@
 defineProps({
   sizes: { type: Array, required: true },
   itemName: { type: String, required: true },
+  // Same "requirement has just become true" treatment the shipping address uses.
+  emphasis: { type: Boolean, default: false },
 })
 
 const size = defineModel({ type: String, default: '' })
@@ -14,8 +16,11 @@ const size = defineModel({ type: String, default: '' })
     <div class="relative">
       <select
         v-model="size"
-        class="h-7 appearance-none rounded-m border border-neutral-muted bg-surface-l0 pl-3 pr-6 text-sm transition-colors hover:bg-neutral-quiet-hover"
-        :class="size ? 'text-neutral' : 'text-neutral-quiet'"
+        class="h-7 appearance-none rounded-m border bg-surface-l0 pl-3 pr-6 text-sm transition-colors hover:bg-neutral-quiet-hover"
+        :class="[
+          size ? 'text-neutral' : 'text-neutral-quiet',
+          emphasis ? 'border-neutral-emphasis' : 'border-neutral-muted',
+        ]"
         :aria-label="$t('step3.sizeFor', { name: itemName })"
       >
         <option value="">{{ $t('step3.selectSize') }}</option>

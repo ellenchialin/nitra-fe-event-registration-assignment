@@ -15,6 +15,12 @@ const emit = defineEmits(['update:quantity', 'update:size'])
 const { priceShort } = useFormatters()
 
 const selected = computed(() => props.selection.quantity > 0)
+
+// A sized item in the order without a size is incomplete. Saying so here, rather than only in the
+// Step 4 error summary, puts the requirement on the control that satisfies it.
+const needsSize = computed(
+  () => selected.value && Boolean(props.addon.sizes?.length) && !props.selection.size,
+)
 </script>
 
 <template>
@@ -35,6 +41,7 @@ const selected = computed(() => props.selection.quantity > 0)
       <SizeSelect
         v-if="addon.sizes"
         :model-value="selection.size ?? ''"
+        :emphasis="needsSize"
         :sizes="addon.sizes"
         :item-name="addon.name"
         @update:model-value="emit('update:size', addon.id, $event || null)"
@@ -48,8 +55,12 @@ const selected = computed(() => props.selection.quantity > 0)
       />
     </div>
 
+    <p v-if="needsSize" class="text-[11px] leading-[14px] font-semibold text-warning-emphasis">
+      {{ $t('step3.sizeRequired') }}
+    </p>
+
     <p
-      v-if="selected"
+      v-else-if="selected"
       class="flex items-center gap-1 text-[11px] leading-[14px] font-semibold text-success"
     >
       <svg viewBox="0 0 16 16" class="size-3 shrink-0" fill="none" aria-hidden="true">

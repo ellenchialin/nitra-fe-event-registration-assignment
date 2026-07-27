@@ -30,6 +30,7 @@ export default {
     addedToOrder: '已加入訂單',
     size: '尺寸：',
     selectSize: '請選擇',
+    sizeRequired: '請選擇尺寸以完成此項目',
     sizeFor: '{name} 的尺寸',
     quantity: '數量：',
     maxQuantity: '最多 {count}',
