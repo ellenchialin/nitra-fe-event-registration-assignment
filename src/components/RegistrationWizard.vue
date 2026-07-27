@@ -24,6 +24,12 @@ const { steps, currentStep, isFirstStep, isLastStep, advanceLabelKey, goNext, go
 const reviewStep = ref(null)
 
 const isSubmitting = computed(() => submissionStatus.value === SUBMISSION_STATUS.SUBMITTING)
+
+// The design's "Validation Error State" frame draws submit disabled, but only in a frame where
+// the error banner is already showing — that is the state after an attempt. Disabling it whenever
+// the form is invalid would deadlock the wizard: errors are gated behind `submitAttempted`, which
+// only a click can set, so a blank form would offer no way to find out what is wrong.
+const blockedByErrors = computed(() => submitAttempted.value && !isValid.value)
 const hasSucceeded = computed(() => submissionStatus.value === SUBMISSION_STATUS.SUCCEEDED)
 
 /**
@@ -93,7 +99,13 @@ function jumpToStep(step) {
             {{ $t(advanceLabelKey) }}
           </BaseButton>
 
-          <BaseButton v-else size="lg" :loading="isSubmitting" @click="handleSubmit">
+          <BaseButton
+            v-else
+            size="lg"
+            :disabled="blockedByErrors"
+            :loading="isSubmitting"
+            @click="handleSubmit"
+          >
             {{ $t(advanceLabelKey) }}
           </BaseButton>
         </div>
