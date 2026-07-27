@@ -63,7 +63,41 @@ export const breakpoints = {
   desktop: '1024px',
 }
 
+// Entry motion for the success screen. Declared as CSS animations rather than Vue transitions:
+// these run from the element's own mount, so nothing depends on requestAnimationFrame, which a
+// backgrounded tab suspends. The check's resting state is fully drawn, so a reduced-motion user
+// who never gets the animation still sees a complete tick.
+export const animation = {
+  keyframes: {
+    'badge-pop': '{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}',
+    'badge-ring': '{from{opacity:0.4;transform:scale(0.9)}to{opacity:0;transform:scale(2.1)}}',
+    'check-draw': '{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}',
+  },
+  durations: {
+    'badge-pop': '480ms',
+    'badge-ring': '900ms',
+    'check-draw': '520ms',
+  },
+  timingFns: {
+    // The badge lands with a real overshoot; the stroke itself stays honest and eases out.
+    'badge-pop': 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+    'badge-ring': 'cubic-bezier(0.16, 1, 0.3, 1)',
+    'check-draw': 'cubic-bezier(0.65, 0, 0.35, 1)',
+  },
+  counts: {
+    'badge-pop': '1',
+    'badge-ring': '1',
+    'check-draw': '1',
+  },
+  properties: {
+    'badge-pop': { 'animation-fill-mode': 'backwards' },
+    'badge-ring': { 'animation-fill-mode': 'backwards' },
+    'check-draw': { 'animation-fill-mode': 'backwards' },
+  },
+}
+
 export const uiTheme = {
+  animation,
   colors,
   fontSize,
   fontFamily,
