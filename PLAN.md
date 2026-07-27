@@ -18,17 +18,17 @@ not cosmetic.
 
 **Phased breakdown**, ordered so that pure logic is settled and testable before any layout work:
 
-| Phase | Scope                                                                                | Est. | Status        |
-| ----- | ------------------------------------------------------------------------------------ | ---- | ------------- |
-| 0     | Environment (Node pin), Figma access, design recon                                   | 0.5h | ✅ Done       |
-| 1     | Foundation — `utils/` (time, currency, validators), `useRegistration` state          | 1h   | ✅ Done       |
-| 2     | Wizard shell + stepper, Step 1 — ticket cards, attendee form, `FormField`            | 1.5h | ✅ Done       |
-| 3     | Step 2 — day tabs, session grid, capacity bars, conflict detection                   | 1h   | ✅ Done       |
-| 4     | Step 3 — category tabs, workshop conflicts, size/qty, shipping banner, order summary | 1.5h | ✅ Done       |
-| 5     | Step 4 — review cards, unified validation, error navigation, submit + success        | 1h   | ✅ Done       |
-| 6     | Polish — responsive layout, interactive states, entry motion                         | 1h   | ✅ Done       |
-| 7     | i18n pass, dead-code sweep, CSS duplication audit                                    | 1h   | ✅ Done       |
-| 8     | Acceptance pass — scenarios below, clean-checkout smoke test                         | 0.5h | ▢ Not started |
+| Phase | Scope                                                                                | Est. | Status  |
+| ----- | ------------------------------------------------------------------------------------ | ---- | ------- |
+| 0     | Environment (Node pin), Figma access, design recon                                   | 0.5h | ✅ Done |
+| 1     | Foundation — `utils/` (time, currency, validators), `useRegistration` state          | 1h   | ✅ Done |
+| 2     | Wizard shell + stepper, Step 1 — ticket cards, attendee form, `FormField`            | 1.5h | ✅ Done |
+| 3     | Step 2 — day tabs, session grid, capacity bars, conflict detection                   | 1h   | ✅ Done |
+| 4     | Step 3 — category tabs, workshop conflicts, size/qty, shipping banner, order summary | 1.5h | ✅ Done |
+| 5     | Step 4 — review cards, unified validation, error navigation, submit + success        | 1h   | ✅ Done |
+| 6     | Polish — responsive layout, interactive states, entry motion                         | 1h   | ✅ Done |
+| 7     | i18n pass, dead-code sweep, CSS duplication audit                                    | 1h   | ✅ Done |
+| 8     | Acceptance pass — scenarios below, clean-checkout smoke test                         | 0.5h | ✅ Done |
 
 Design fidelity is 20% of the rubric, so Phase 0 was deliberately front-loaded: guessing at spacing
 and then correcting it later is the most expensive way to lose those points.
@@ -167,14 +167,18 @@ Geometry matches frame `1073:899` exactly: the 1200px content column splits 788 
 workshop cards are 120px, and the order summary is 380×211 rendering `$599.00 + $149.00 − $14.90 =
 $733.10` — the design's own numbers, arrived at independently.
 
-_Unavailability is derived, not enforced._ The README asks that a workshop overlapping a selected
-session be marked unavailable. Rather than watch the session selection and delete the add-on,
-`unavailableAddonIds` is a `computed` over sold-out state and schedule overlap, and both
-`selectedAddonLines` and `setAddonQuantity` respect it. A workshop that a later session choice puts
-out of reach silently stops counting toward the total, and returns intact if that session is
-dropped. That keeps the "derived state is computed, never watch" rule honest and makes the
-back-and-forth non-destructive, which is the behaviour a user navigating freely between steps
-expects.
+_Unavailability is derived, not enforced — mostly._ The README asks that a workshop overlapping a
+selected session be marked unavailable. `unavailableAddonIds` is a `computed` over sold-out state
+and schedule overlap, and both `selectedAddonLines` and `setAddonQuantity` respect it, so a workshop
+a session choice puts out of reach stops counting toward the total without anything watching for it.
+
+That held until a later bug report showed the gap: a workshop dropped out of reach this way still
+read as selected in state, so the card and the order summary disagreed, and it silently returned to
+the total if the clash cleared. `a1f80a8` (Phase 7) added `dropAddonsClashingWith`, called from
+`toggleSession` — the one place selection is genuinely destructive in this app, and deliberately so:
+it fires from the click that caused the clash, not from a watcher polling for it, which keeps the
+"derived state is computed, never watch" rule intact. The trade is that the workshop does not come
+back if the clashing session is later removed; re-adding it is a second, explicit action.
 
 _A shared card, until it stopped being shared._ Workshops and meal packages are the same card with
 optional rows, so one `AddonCard` renders both — a meal simply has no schedule or capacity line.
@@ -351,6 +355,44 @@ typography class would fall through to Quasar's much larger scale.
 
 ---
 
+**Phase 8 — Acceptance pass**
+
+All 20 scenarios from §1a run against the live app (N3 stays dropped, per §1a). N1, N2, D1–D5, C1,
+C2, C4, P1–P4, V1, V2, V4, V5, S1–S4 pass as specified, driven through the actual composable state
+and DOM, not asserted from reading the code. C3, S3 and S5 are called out below because each one
+surfaced something worth recording rather than a clean pass.
+
+_C3 exposed a stale scenario, not a bug._ The scenario as written expected the workshop to survive
+a retroactive conflict. `a1f80a8` (Phase 7) changed that on purpose — see the corrected Phase 4 note
+above — and nobody had gone back to update the acceptance scenario or the narrative that motivated
+it. Both are rewritten in this pass. Running the acceptance list is what surfaces this kind of drift;
+reading the code in isolation would not have flagged it, because the code was internally consistent
+with itself the whole time.
+
+_S3 passed, including the part that is easy to skip._ Locale, date and currency all localise
+correctly, and `<html lang>` follows — confirming the fix earlier in this session actually reaches
+the DOM under real navigation, not just the isolated test that motivated it.
+
+_S5 is verified structurally, not by a live keystroke._ Ticket cards, session cards and quantity
+pickers are all native `<button>` elements with no custom keydown handler, so Enter/Space activation
+is the browser's own default behaviour, not app logic that could be wrong. What I could not get was
+a live keystroke round-trip: partway through this pass, this preview pane's input injection stopped
+reaching the page at all, for both clicks and key presses, on elements that had worked minutes
+earlier in the same tab (the same stepper button that satisfied N2). `elementFromPoint` found the
+correct element with nothing overlapping it, and a JS-dispatched `.click()` on that same element
+still worked — so the click handler was never in question, only the tool's ability to deliver a
+trusted input event to the page. Recorded as a verification gap rather than papered over with the
+`.click()` workaround, since that would prove the handler works without proving keyboard access
+does.
+
+_Release check._ A fresh `git clone` into a scratch directory, Node pinned to 22.17.0 via `nvm use`,
+then `yarn install && yarn build && yarn dev`. Install succeeds with one pre-existing peer-dependency
+warning (`unocss` wants `vite` directly; `@quasar/app-vite` supplies it transitively) unrelated to
+anything changed this session. Build succeeds. Dev server boots on first try and serves `HTTP 200`
+with no manual steps — the actual text of the submission requirement, not a paraphrase of it.
+
+---
+
 ## 1a. How this is verified
 
 "Ensure core functionality is working" is the assignment's first requirement, so verification is
@@ -381,8 +423,10 @@ testing `s2`&`s3` would prove nothing, since `s2` can never be selected.
 
 - C1 — `s4` + `s5` selected → conflict surfaces at submit, not before.
 - C2 — `s11` + `s12` selected → same.
-- C3 — `ws1` selected, then `s11` added on Step 2 → the retroactive conflict is flagged on Step 3
-  and the workshop is _not_ silently de-selected.
+- C3 — `ws1` selected, then `s11` added on Step 2 → `ws1` is dropped from the selection
+  (`dropAddonsClashingWith`, `a1f80a8`) and no longer counted in the order summary. This scenario's
+  wording changed after Phase 4 was written; see the Phase 4 note above for why the earlier
+  non-destructive behaviour was replaced.
 - C4 — Back-to-back sessions (`s1` 09:00–10:00 with a 10:00 start) are never flagged.
 
 **Pricing**
@@ -697,13 +741,36 @@ then correct live once the user has submitted once — matching the disabled-sub
 error frame.
 
 **Retroactive workshop conflicts.** A user can select `ws1` on Step 3, navigate back to Step 2, and
-add `s11` — which now conflicts with an already-selected workshop. Silently de-selecting the
-workshop destroys user input without explanation. I keep the selection, flag the card inline, and
-count it toward Step 3's error badge. Same principle as the README's own choice to defer session
-conflicts rather than block them.
+add `s11` — which now conflicts with an already-selected workshop. My first answer was to keep the
+selection and flag the card inline, on the reasoning that silently de-selecting destroys user input.
+That was wrong in a way only testing surfaced: the workshop stayed in state but was filtered out of
+`selectedAddonLines`, so the card and the order summary disagreed about whether it was selected, and
+it would silently reappear in the total if the clash later cleared. `a1f80a8` replaced it with
+`dropAddonsClashingWith`, called from `toggleSession` — the removal is attributable to the click
+that caused it, rather than to a watcher observing state after the fact. The cost is that dropping
+the clashing session does not bring the workshop back; re-adding it is a second, explicit action.
 
 **Rounding.** The VIP discount is 10% of the workshop subtotal computed once on the summed total,
 not per line item, so the itemised breakdown always reconciles against the grand total.
+
+**The ticket radiogroup keeps every card tabbable, deviating from the ARIA pattern on purpose.**
+`TicketCard` is a `<button role="radio">` inside a `role="radiogroup"`, which conveys something
+plain buttons cannot: three mutually exclusive options, exactly one selected. The WAI-ARIA Authoring
+Practices pattern for that role also expects roving tabindex — one tab stop for the whole group,
+arrow keys moving focus and selection together.
+
+I built that, verified it worked, and reverted it. The pattern assumes the user knows to press arrow
+keys, which is true for screen reader users who are told so and false for sighted keyboard users who
+are not. Adopting it meant Tab silently skipping two of the three cards with no visual cue — trading
+a correct-by-spec implementation for a worse experience for the larger group. Keeping all three
+tabbable is the deviation; dropping `role="radio"` to make the keyboard behaviour "honest" would
+have been the bigger loss, since it discards the exclusivity semantics entirely.
+
+Worth being precise that this is not a conformance failure: SC 2.1.1 (Keyboard) is met — every card
+is reachable and operable via Tab and Enter/Space — and SC 4.1.2 (Name, Role, Value) is met through
+`role` and `aria-checked`. The APG is guidance, not a requirement, and this is a trade a number of
+shipped design systems make for the same reason. The remaining gap is that I have not verified what
+a screen reader actually announces here, so the deviation is reasoned rather than measured.
 
 ---
 
@@ -851,6 +918,13 @@ correcting.
   probably missed the `--q-primary` trap.
 - _Naming the timezone risk before it bit._ The UTC-vs-local boundary problem with `ws2` was flagged
   during planning rather than discovered as a mysterious grouping bug at 11pm.
+- _Being asked the question the audit forgot to ask._ Phase 6 audited Quasar usage, found zero
+  components, and concluded that was fine. The reasoning was sound and I did not think to question
+  it. One prompt did — _the assignment specifies Quasar, but we are not using it at all; does that
+  make sense?_ — and reframed the audit from "which components did I use?" to "where is a control
+  costing me fidelity that Quasar already solves?" Only the second question finds anything. It found
+  the size control, flagged and accepted in Phase 4 on a cost estimate that had stopped being true
+  the moment Quasar counted as available rather than as scenery.
 
 **Where it fell short, and what I did about it**
 
@@ -874,10 +948,31 @@ correcting.
   "group by". The design says tabs. A plan built from written specs alone would have produced the
   wrong components for two of the four steps — the argument for doing design recon before
   implementation rather than after.
+- _It verified the signal it was thinking about, not the one that would have answered the question._
+  This recurred often enough to be the single most useful thing in this section:
 
-The general pattern: it is strong at exhaustive cross-referencing across many files, and weak at
-knowing which of two conflicting sources is authoritative. The second is where the review effort
-belongs.
+  | Change             | What was verified                | What actually decided it                                                                                                                          |
+  | ------------------ | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | Favicon            | `HTTP 200`, correct content-type | Whether it _parsed_ — a `--` inside an XML comment made the SVG unparseable                                                                       |
+  | Stepper labels     | The `aria-label` being fixed     | The display mechanism swapped in the same commit; Quasar's `.hidden{display:none!important}` hid the labels at every width                        |
+  | Required fields    | The Figma frames                 | The README's field table, which lists Job Title                                                                                                   |
+  | `<html lang>` sync | A cold load reading `en-US`      | That Quasar's default and the new watcher _agree_ on `en-US`; only flipping `DEFAULT_LOCALE` to `zh-TW` made them disagree and settled which wins |
+
+  Serving, naming and defaulting are all easy to confirm and none of them were the question. The
+  correction is not "verify more" — it is "verify the surface the change actually touched." Applying
+  that deliberately is what caught the `QSelect` swap shipping a combobox with no accessible name.
+
+- _A living journal goes stale where the code moves fastest._ Five claims in this document became
+  false without anyone noticing: "no watchers at all" (three copies, after the `lang` watcher),
+  "the only three Quasar collisions" (typography collides too), and the retroactive-workshop
+  behaviour (three copies, after `a1f80a8` replaced flag-in-place with drop-on-clash). Every one was
+  true when written. The acceptance pass is what surfaced the last set, because running a scenario
+  compares the document against the app, whereas re-reading code only proves the code agrees with
+  itself.
+
+The general pattern: strong at exhaustive cross-referencing across many files, weak at knowing which
+of two conflicting sources is authoritative — and weakest at noticing that the question it is
+confidently answering is not the question that matters. All three are where review effort belongs.
 
 ---
 
@@ -889,27 +984,43 @@ belongs.
   documented above.
 - **A mockup that is not internally consistent.** Required deciding which parts are specification
   (states, tokens, layout) and which are illustrative filler (which specific card is greyed out).
+- **Quasar's global stylesheet.** Five bugs, listed in §5, each found by measuring rather than
+  reading. The recurring shape is a class that exists in both Quasar and UnoCSS where the winner
+  depends on `!important` and sheet order, so the generated CSS looks correct in the diff and
+  renders wrong in the browser.
+- **A preview pane that silently lies about motion.** It runs with `document.hidden === true`, so
+  `requestAnimationFrame` never fires and CSS transitions never advance. Two consequences worth
+  recording: `getComputedStyle` during a stalled transition returns the _start_ value forever, which
+  once produced a confidently wrong conclusion about a focus style that was in fact working — the
+  reliable read is `getAnimations()`, which reports the intended `from`/`to`. And Quasar's `QMenu`
+  stays pinned in `q-transition--fade-enter-from` with its options never mounted, so the `QSelect`
+  popups could not be inspected at all until patching `requestAnimationFrame` onto `setTimeout` in
+  the page released them. Before finding that, the honest position was that the closed control
+  measured correctly and the open one was unverified — which is what I reported rather than
+  inferring the rest.
+- **Verification tooling failing mid-session.** During the acceptance pass the preview's synthetic
+  input stopped reaching the page for both clicks and key presses, on elements that had worked
+  minutes earlier. `elementFromPoint` returned the right element with nothing overlapping it and a
+  JS-dispatched `.click()` still worked, which isolated it to input delivery rather than the app. It
+  leaves S5's keyboard traversal verified structurally — native `<button>`s, no custom key handling,
+  so activation is browser default — but not by a live keystroke. Recorded as a gap rather than
+  closed with a `.click()` that would have proven the handler and not the keyboard path.
 
 ---
 
 ## 8. What I would improve with more time
 
-- **Sync the step to the URL, and only then persist state.** Cut from Phase 6 after arguing it
-  through. Most of the usual justifications do not apply here: `?step=3` carries no state, so it is
-  not shareable, and nothing is persisted, so a refresh loses the form either way. One argument does
-  survive — the wizard advertises its steps as navigable places, with a stepper, a Back button and
-  preserved state, while the browser has only ever seen one location. Pressing Back, the most
-  conventional way to say "go back", therefore exits the app and discards a filled form. That is the
-  UI creating an expectation it then breaks, and it is the reason to build this first if the work
-  resumed. It was cut because responsive layout and the acceptance pass carry more weight against
-  the rubric, and a broken mobile layout costs more than a Back button that leaves.
-- **Persist state to `sessionStorage`.** The natural pair to the above: it does not stop Back from
-  leaving, but it makes the departure non-destructive. Left out deliberately — it drags in
-  rehydration and schema-versioning concerns for a case unlikely to be exercised in review, and a
-  half-working persistence layer is worse than none.
-- **Unit tests** over `rangesOverlap`, the capacity-band thresholds, and the pricing reducer.
-- **Virtualise the session grid** if the dataset grew — irrelevant at 12 sessions, relevant at 200.
-- **Fuller a11y pass** — the cards are checkbox/radio groups and want proper roving focus and
-  `aria-describedby` wiring to their error messages, beyond the keyboard and contrast basics.
+- **Sync the step to the URL.** Cut from Phase 6: the wizard has a stepper and a Back button that
+  imply navigable steps, but the browser has only ever seen one location — so pressing Back exits
+  the app and discards a filled form. Real gap, but responsive layout and the acceptance pass
+  outweighed it against the rubric.
+- **Persist state to `sessionStorage`.** Pairs with the above — doesn't stop Back from leaving, but
+  makes it non-destructive. Left out to avoid rehydration/versioning concerns for a case unlikely to
+  come up in review.
+- **Unit tests** over `rangesOverlap`, the capacity-band thresholds, and the pricing reducer. Not
+  evaluated per the brief, but the two functions where an off-by-one would be invisible in the UI.
+- **Virtualise the session grid if the dataset grows.** DOM windowing (e.g. `vue-virtual-scroller`),
+  not pagination — there's no backend here, so data is always loaded in full; this is only about
+  not mounting 200 `SessionCard`s at once. No-op at today's 12.
 - **Confirm the capacity threshold values with the designer.** I derived the colour bands by reading
   fill percentages off the mockup; the exact cut-points are inferred, not specified.
