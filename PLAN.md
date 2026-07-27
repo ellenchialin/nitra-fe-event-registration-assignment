@@ -717,7 +717,7 @@ justify each exception.
 | `date-fns` / `dayjs`         | **Rejected**                       | `Intl.DateTimeFormat` with `timeZone: 'UTC'` covers every formatting case here, and overlap detection is a two-line numeric comparison on epoch millis. A date library would add weight to avoid roughly 20 lines of standard-library code.                             |
 | `lodash-es`                  | **Rejected**                       | Grouping is a four-line `reduce`. Not worth a dependency.                                                                                                                                                                                                               |
 | Pinia                        | **Rejected**                       | The rubric explicitly asks for composable or `provide`/`inject` state. A store library would sidestep the thing being assessed, for a single-screen wizard that never needs cross-route persistence.                                                                    |
-| `quasar`                     | **Kept — tooling, plus `QSelect`** | Audited in Phase 6 as tooling-only. Revisited after Phase 7 when the audit's own framing was questioned: `QSelect` now backs the merchandise size control. See below.                                                                                                   |
+| `quasar`                     | **Kept — tooling, plus `QSelect`** | Audited in Phase 6 as tooling-only. Revisited after Phase 7 when the audit's own framing was questioned: `QSelect` now backs the merchandise size control and the locale switcher. See below.                                                                           |
 | `vitest`                     | **Considered**                     | Test coverage is explicitly not evaluated. If time allows I would add a small suite over `rangesOverlap` and the pricing reducer — the two functions where an off-by-one is both plausible and invisible in the UI.                                                     |
 
 _What Quasar actually earns its place doing._ The Phase 6 audit was stark: **27 bespoke components,
@@ -791,6 +791,24 @@ rAF never fires and the menu stays pinned in `q-transition--fade-enter-from` (`v
 0×0) with its options unmounted. Patching `requestAnimationFrame` onto `setTimeout` in the page
 releases it. Before finding that, I could measure the closed control and nothing else — and said so
 rather than calling the change done.
+
+_And a second: the locale switcher._ Once the pattern existed, the header's bare `<select>` was the
+obvious next candidate — it was the last native dropdown in the app, and a full-width word ("English"
+/ "繁體中文") where the design has room for an icon. It is now a 32×32 icon button that opens the same
+menu, right-aligned under itself, 48px from the header edge on desktop and 24px on mobile, with the
+header still measuring 73px.
+
+The icon is an inlined SVG rather than `<q-icon name="translate">`. `extras: ['material-icons']` is
+configured in `quasar.config.js` and its CSS is fetched on every load, but the app renders no glyphs
+from it, so the woff2 itself never is — reaching for `QIcon` here would have pulled a ~100KB webfont
+for a single symbol. Inlining matches what `BrandMark` and `CircleCheckIcon` already do, and takes
+`currentColor`. **That config entry is now dead weight and should be dropped.**
+
+One pre-existing gap this surfaced, unrelated to the swap: nothing ever updates `<html lang>`.
+Quasar's Lang pack sets it to `en-US` at boot and it never follows `vue-i18n`, so the document still
+claims English while rendering Chinese — which changes how a screen reader pronounces the page. The
+old `<select>` had the same hole, so it is not a regression, but it is the one place where syncing
+genuinely external state would justify the app's only watcher.
 
 Would I choose this stack greenfield? No — plain Vite + Vue + UnoCSS gives the same tooling without
 a second CSS baseline to fight. But the starter is the starting point the brief specifies, and
