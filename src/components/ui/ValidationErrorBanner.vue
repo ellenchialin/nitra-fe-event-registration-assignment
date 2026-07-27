@@ -8,7 +8,7 @@ defineProps({
   <div
     role="alert"
     tabindex="-1"
-    class="flex flex-col gap-2 rounded-m border border-danger-muted bg-danger-subtle-rest p-4 text-danger focus:outline-none"
+    class="flex flex-col gap-2 rounded-m border border-danger-muted bg-danger-muted-rest p-4 text-danger focus:outline-none"
   >
     <p class="text-sm font-semibold">{{ $t('errors.title') }}</p>
 
