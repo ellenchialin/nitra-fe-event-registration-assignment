@@ -203,11 +203,15 @@ _Groundwork for V3._ A size only matters once the item is actually in the order,
 `merchandiseMissingSize` reads the priced lines rather than every sized product — a t-shirt sized
 "M" and then decremented to zero is not an error. Phase 5's rule array consumes it directly.
 
-_Where the design and the platform disagree._ The size control is a native `<select>`, which sizes
+_Where the design and the platform disagree._ The size control was a native `<select>`, which sizes
 itself to its widest option — 74px against the design's 45px for a chosen "M". Matching the design
 exactly means a custom listbox: a popup, focus management, and type-ahead, all to save 29px on a
-control that already has correct keyboard and mobile behaviour. Not worth it here, and flagged
-rather than hidden.
+control that already had correct keyboard and mobile behaviour. I judged that not worth it, and
+flagged it rather than hiding it.
+
+**That verdict was later overturned — see the note at the end of §5.** The reasoning was sound but
+rested on an unexamined premise: that the listbox would have to be hand-built. Quasar was already in
+the dependency tree.
 
 The merchandise frame (`1149:565`) also draws its text at 19/15/13px line boxes where the workshop
 frame uses 20/16/14 — so merchandise cards render 134px against the frame's 131. The typography
@@ -706,19 +710,19 @@ not per line item, so the itemised breakdown always reconciles against the grand
 The starter ships Vue, Quasar, vue-router and UnoCSS. My default position was to add nothing and
 justify each exception.
 
-| Dependency                   | Verdict                       | Reasoning                                                                                                                                                                                                                                                               |
-| ---------------------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `vue-i18n`                   | **Added**                     | i18n is a listed nice-to-have. It only stays cheap if strings are keyed from the first commit; retrofitting an extraction pass across 15 components is where this turns into hours. Also routes date/currency formatting through one locale-aware layer instead of two. |
-| Inter Variable (self-hosted) | **Added**                     | The design is set in Inter at variable weights and the starter loads no font. Self-hosted rather than a Google Fonts CDN link so a clean checkout works offline and there is no render-blocking third-party request.                                                    |
-| `date-fns` / `dayjs`         | **Rejected**                  | `Intl.DateTimeFormat` with `timeZone: 'UTC'` covers every formatting case here, and overlap detection is a two-line numeric comparison on epoch millis. A date library would add weight to avoid roughly 20 lines of standard-library code.                             |
-| `lodash-es`                  | **Rejected**                  | Grouping is a four-line `reduce`. Not worth a dependency.                                                                                                                                                                                                               |
-| Pinia                        | **Rejected**                  | The rubric explicitly asks for composable or `provide`/`inject` state. A store library would sidestep the thing being assessed, for a single-screen wizard that never needs cross-route persistence.                                                                    |
-| `quasar`                     | **Kept, but only as tooling** | Audited in Phase 6: zero `<q-*>` components, zero imports from the package, no utility classes, `framework.plugins` empty. See below.                                                                                                                                   |
-| `vitest`                     | **Considered**                | Test coverage is explicitly not evaluated. If time allows I would add a small suite over `rangesOverlap` and the pricing reducer — the two functions where an off-by-one is both plausible and invisible in the UI.                                                     |
+| Dependency                   | Verdict                            | Reasoning                                                                                                                                                                                                                                                               |
+| ---------------------------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `vue-i18n`                   | **Added**                          | i18n is a listed nice-to-have. It only stays cheap if strings are keyed from the first commit; retrofitting an extraction pass across 15 components is where this turns into hours. Also routes date/currency formatting through one locale-aware layer instead of two. |
+| Inter Variable (self-hosted) | **Added**                          | The design is set in Inter at variable weights and the starter loads no font. Self-hosted rather than a Google Fonts CDN link so a clean checkout works offline and there is no render-blocking third-party request.                                                    |
+| `date-fns` / `dayjs`         | **Rejected**                       | `Intl.DateTimeFormat` with `timeZone: 'UTC'` covers every formatting case here, and overlap detection is a two-line numeric comparison on epoch millis. A date library would add weight to avoid roughly 20 lines of standard-library code.                             |
+| `lodash-es`                  | **Rejected**                       | Grouping is a four-line `reduce`. Not worth a dependency.                                                                                                                                                                                                               |
+| Pinia                        | **Rejected**                       | The rubric explicitly asks for composable or `provide`/`inject` state. A store library would sidestep the thing being assessed, for a single-screen wizard that never needs cross-route persistence.                                                                    |
+| `quasar`                     | **Kept — tooling, plus `QSelect`** | Audited in Phase 6 as tooling-only. Revisited after Phase 7 when the audit's own framing was questioned: `QSelect` now backs the merchandise size control. See below.                                                                                                   |
+| `vitest`                     | **Considered**                     | Test coverage is explicitly not evaluated. If time allows I would add a small suite over `rangesOverlap` and the pricing reducer — the two functions where an off-by-one is both plausible and invisible in the UI.                                                     |
 
-_What Quasar actually earns its place doing._ The audit is stark: **27 bespoke components, zero
-Quasar ones.** Nothing imports from the `quasar` package, no `q-` utility class appears in any
-template, and no plugins are enabled. What the framework provides here is `@quasar/app-vite` — the
+_What Quasar actually earns its place doing._ The Phase 6 audit was stark: **27 bespoke components,
+zero Quasar ones.** Nothing imported from the `quasar` package, no `q-` utility class appeared in
+any template, and no plugins were enabled. What the framework provided was `@quasar/app-vite` — the
 build, the dev server, the boot-file convention — plus the `--q-*` colour aliases the starter wired
 into `colors.scss`.
 
@@ -726,6 +730,19 @@ Its components went unused because the design is a specific token system with ex
 Quasar's are opinionated: matching `162px` session cards, a `48px` submit in an `80px` bar, and
 Figma's own `#3A7679` link colour means overriding a Q-component's internals until little of it
 remains. Writing a small component against the token set is less code than defeating one.
+
+That reasoning still holds for most of the app. It did not hold everywhere, and the audit did not
+notice — because it asked "which Quasar components did I use?" rather than "where is a control
+costing me fidelity that Quasar already solves?" Those are different questions, and only the second
+one finds anything. It took an outside prompt to ask it: _the assignment specifies Quasar, but we
+are not using it at all — does that make sense?_
+
+Re-reading the brief settled the framing. The stack clause reads "Use Vue 3.5.17 with Quasar
+Framework v2.18.5 (the starter repo is preconfigured for you)" — a constraint on the stack, not a
+quota of components; and none of the five evaluation criteria mention Quasar. So tooling-only was
+defensible. But the question sent me back through the flagged fidelity gaps, and the size control
+was sitting there: rejected at Phase 4 because a listbox is expensive to build, when `QSelect` is a
+listbox that was already installed. The cost side of that trade had been wrong for three phases.
 
 That is not a free ride. Quasar's global stylesheet caused five bugs, each found by measuring
 rather than reading:
@@ -738,6 +755,42 @@ rather than reading:
 5. `.disabled, [disabled] { opacity: .6 !important }`, dimming the submit button's spinner (Phase 6)
 
 Each is now fixed by a preflight in `uno.config.js` or recorded in CLAUDE.md so it does not recur.
+
+_The one place Quasar wins: `QSelect` for the merchandise size._ Swapping the native `<select>`
+closed the gap flagged in Phase 4. Chosen-state widths now measure S 45.9 / M 49.1 / L 44.9 /
+XL 53.4 / XXL 61.9, against a flat 74px before and a 45px design reference — and the control sizes
+to its content rather than to its widest option, which was the actual defect. Height (28px), radius
+(6px) and every colour token are unchanged. No new dependency: `QSelect` auto-imports through
+`@quasar/app-vite`, so `framework.plugins` stays empty.
+
+It is not free, and the costs are worth recording honestly:
+
+- The empty state is still 74px, because "Select" is simply a wide word. The win is in the chosen
+  state, which is the common one.
+- `QSelect` puts `role="combobox"` on an inner focus target and routes `aria-label` to a
+  presentational div, so the control shipped **unnamed** until I checked. The fix leans on the root
+  being a `<label for>`: text anywhere inside names the target, and the visible value is marked
+  `aria-hidden` so it does not leak into the name.
+- There was no focus styling at all. Now `focus-within:border-brand-emphasis`, matching `FormField`.
+- The popup anchors to `.q-field__control`, so padding on the outer label pushed the menu 12px right
+  and aligned it to the text instead of the button. Padding moved onto the anchor; alignment set
+  explicitly via `menu-anchor` / `menu-self` rather than left to defaults.
+- One `<style scoped>` block with `:deep()` — the only third-party styling in the app — because
+  Quasar sizes the field skeleton for a 40px dense control.
+- On touch devices this is Quasar's popup, not the OS picker wheel. More consistent with the design,
+  but a genuine trade rather than a pure win.
+
+The first two were regressions **I introduced**, and both were invisible from the closed control.
+That is the same failure mode as the favicon and the stepper labels in §7: verifying the thing I was
+thinking about instead of the surface the change actually touched. The habit that caught them was
+checking the accessibility tree and the focus state because I had changed the control, not because I
+suspected anything.
+
+Verifying the popup at all needed a workaround. This preview pane runs with `document.hidden`, so
+rAF never fires and the menu stays pinned in `q-transition--fade-enter-from` (`visibility: collapse`,
+0×0) with its options unmounted. Patching `requestAnimationFrame` onto `setTimeout` in the page
+releases it. Before finding that, I could measure the closed control and nothing else — and said so
+rather than calling the change done.
 
 Would I choose this stack greenfield? No — plain Vite + Vue + UnoCSS gives the same tooling without
 a second CSS baseline to fight. But the starter is the starting point the brief specifies, and
