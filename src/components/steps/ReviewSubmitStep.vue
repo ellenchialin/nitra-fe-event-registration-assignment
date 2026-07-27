@@ -25,7 +25,7 @@ const ATTENDEE_FIELDS = [
   { key: 'email', required: () => true },
   { key: 'phone', required: () => true },
   { key: 'company', required: () => true },
-  { key: 'jobTitle', required: () => false },
+  { key: 'jobTitle', required: () => true },
 ]
 
 const attendeeRows = computed(() => {

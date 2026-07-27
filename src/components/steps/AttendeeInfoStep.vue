@@ -83,6 +83,8 @@ const shippingLabel = computed(() =>
           class="tablet:col-span-2"
           :label="$t('fields.jobTitle.label')"
           :placeholder="$t('fields.jobTitle.placeholder')"
+          :required="true"
+          :error-message="fieldError('jobTitle')"
           autocomplete="organization-title"
         />
         <FormField

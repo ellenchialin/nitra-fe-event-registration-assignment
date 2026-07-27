@@ -79,6 +79,7 @@ export default {
     phoneRequired: 'Phone number is required',
     phoneInvalid: 'Enter a valid phone number',
     companyRequired: 'Company is required',
+    jobTitleRequired: 'Job title is required',
     shippingRequired: 'Shipping address is required for merchandise orders',
     sessionConflict: 'Selected sessions overlap in time: {pairs}',
     conflictPair: '{first} and {second}',

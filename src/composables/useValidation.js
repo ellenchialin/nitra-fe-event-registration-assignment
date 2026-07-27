@@ -56,6 +56,12 @@ export const VALIDATION_RULES = Object.freeze([
   },
   {
     step: 1,
+    field: 'jobTitle',
+    messageKey: 'errors.jobTitleRequired',
+    validate: (subject) => isNonEmpty(subject.attendee.jobTitle),
+  },
+  {
+    step: 1,
     field: 'shippingAddress',
     messageKey: 'errors.shippingRequired',
     validate: (subject) => !subject.hasMerchandise || isNonEmpty(subject.attendee.shippingAddress),

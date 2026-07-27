@@ -82,6 +82,7 @@ export default {
     phoneRequired: '請填寫電話號碼',
     phoneInvalid: '請輸入有效的電話號碼',
     companyRequired: '請填寫公司名稱',
+    jobTitleRequired: '請填寫職稱',
     shippingRequired: '訂購周邊商品時必須填寫寄送地址',
     sessionConflict: '已選議程時間衝突：{pairs}',
     conflictPair: '{first} 與 {second}',

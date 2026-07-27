@@ -220,12 +220,18 @@ screen. Geometry matches frame `1074:897`: review cards at 20px padding with 12p
 88 for six, three and one row), the pricing card at 8px rows, and a 48px submit button in an 80px
 action bar against 40px in 72px on every other step.
 
-_The two review frames are not inconsistent — they follow a rule._ The normal frame lists Job Title
-but no Shipping Address; the error frame lists Shipping Address but no Job Title. Rather than pick
-one and call the other a Figma slip, both fall out of a single rule: **a row appears when it has a
-value, or when it is required.** Job Title is optional and empty in the error frame, so it is
-dropped; Shipping Address is required there because that order contains merchandise. Checked
-against both frames' add-on lists, which confirm the merchandise presence each implies.
+_A row appears when it has a value, or when it is required._ That rule is what decides the attendee
+section, and it explains why the normal frame shows Shipping Address only when merchandise is in
+the order.
+
+I originally reached further and claimed it also reconciled the two frames' treatment of Job Title —
+present in one, absent from the other — on the grounds that Job Title was optional. **It is not.**
+The README's field table lists it as required, which I missed on the first pass and which the error
+frame contradicts by omitting it entirely. So the frames really are inconsistent here, the rule does
+not rescue them, and source precedence settles it: the README wins and Job Title is validated. The
+neat explanation was the appealing one rather than the correct one, which is worth recording as its
+own lesson — a rule that explains away an inconsistency deserves more suspicion than one that merely
+describes behaviour.
 
 _Validation is one array, and nothing maintains a second copy._ `VALIDATION_RULES` is nine entries
 of `{ step, field, messageKey, validate }`, and the stepper's red badges, the error banner, the
