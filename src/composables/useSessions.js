@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { sessions } from '../mocks/sessions.js'
 import { groupByUtcDay, overlappingPairs, schedulesOverlap } from '../utils/time.js'
 import { useRegistration } from './useRegistration.js'
@@ -12,11 +12,10 @@ import { useRegistration } from './useRegistration.js'
  * @returns {object} Day groups, the active day, and selection helpers.
  */
 export function useSessions() {
-  const { selectedSessionIds, selectedSessions, isSessionSelected, toggleSession } =
+  const { selectedSessionIds, selectedSessions, activeDayKey, isSessionSelected, toggleSession } =
     useRegistration()
 
   const dayGroups = computed(() => groupByUtcDay(sessions))
-  const activeDayKey = ref(dayGroups.value[0]?.dayKey ?? '')
 
   const activeDaySessions = computed(
     () => dayGroups.value.find((group) => group.dayKey === activeDayKey.value)?.items ?? [],

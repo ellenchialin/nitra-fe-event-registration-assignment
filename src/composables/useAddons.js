@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { addons } from '../mocks/addons.js'
 import { schedulesOverlap } from '../utils/time.js'
 import { ADDON_CATEGORY, useRegistration } from './useRegistration.js'
@@ -22,6 +22,7 @@ export function useAddons() {
   const {
     selectedSessions,
     unavailableAddonIds,
+    activeAddonCategory,
     hasMerchandise,
     getAddonSelection,
     setAddonQuantity,
@@ -29,10 +30,8 @@ export function useAddons() {
     toggleAddon,
   } = useRegistration()
 
-  const activeCategory = ref(ADDON_CATEGORY.WORKSHOP)
-
   const activeAddons = computed(() =>
-    addons.filter((addon) => addon.category === activeCategory.value),
+    addons.filter((addon) => addon.category === activeAddonCategory.value),
   )
 
   /**
@@ -67,7 +66,7 @@ export function useAddons() {
 
   return {
     categories: ADDON_CATEGORIES,
-    activeCategory,
+    activeCategory: activeAddonCategory,
     activeAddons,
     hasMerchandise,
     isAddonSelected,

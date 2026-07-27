@@ -1,4 +1,5 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
 import { STEP_STATUS, TOTAL_STEPS } from '../composables/useStepper.js'
 
 defineProps({
@@ -6,6 +7,34 @@ defineProps({
 })
 
 const emit = defineEmits(['select'])
+
+const { t } = useI18n()
+
+const STATUS_SUFFIX_KEYS = {
+  [STEP_STATUS.COMPLETED]: 'a11y.stepCompleted',
+  [STEP_STATUS.ERROR]: 'a11y.stepHasErrors',
+}
+
+/**
+ * The whole announcement for a step button.
+ *
+ * Status is otherwise carried only by colour and a bare "!", which assistive tech cannot read, so
+ * a failing step would sound identical to a passing one. Composed here as a single `aria-label`
+ * rather than layered sr-only spans, so the name is exactly one string with no stray fragments.
+ *
+ * @param {{number: number, key: string, status: string}} step - Step to describe.
+ * @returns {string} Position, label, and status where the status is not already implied.
+ */
+function stepAriaLabel(step) {
+  const name = t('a11y.stepOf', {
+    number: step.number,
+    total: TOTAL_STEPS,
+    label: t(`steps.${step.key}`),
+  })
+
+  const suffixKey = STATUS_SUFFIX_KEYS[step.status]
+  return suffixKey ? `${name}, ${t(suffixKey)}` : name
+}
 
 const CIRCLE_CLASSES = {
   [STEP_STATUS.ACTIVE]: 'bg-brand-emphasis-rest text-inverse',
@@ -39,10 +68,12 @@ const LABEL_CLASSES = {
       <button
         type="button"
         class="flex shrink-0 items-center gap-2.5 rounded transition-opacity hover:opacity-80"
+        :aria-label="stepAriaLabel(step)"
         :aria-current="step.status === STEP_STATUS.ACTIVE ? 'step' : undefined"
         @click="emit('select', step.number)"
       >
         <span
+          aria-hidden="true"
           class="flex size-8 items-center justify-center rounded-full text-[14px] font-semibold transition-colors duration-200"
           :class="CIRCLE_CLASSES[step.status]"
         >
@@ -61,14 +92,14 @@ const LABEL_CLASSES = {
           <template v-else>{{ step.number }}</template>
         </span>
 
+        <!-- Decorative: the button's aria-label already carries label and status. Hidden below
+             tablet because four labels plus connectors do not fit a phone. -->
         <span
-          class="text-[13px] transition-colors duration-200"
+          aria-hidden="true"
+          class="hidden text-[13px] transition-colors duration-200 tablet:inline"
           :class="LABEL_CLASSES[step.status]"
         >
-          <span class="sr-only tablet:not-sr-only">{{ $t(`steps.${step.key}`) }}</span>
-          <span class="sr-only">
-            {{ $t('a11y.stepOf', { number: step.number, total: TOTAL_STEPS, label: '' }) }}
-          </span>
+          {{ $t(`steps.${step.key}`) }}
         </span>
       </button>
     </template>

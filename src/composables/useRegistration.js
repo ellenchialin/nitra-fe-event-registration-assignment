@@ -2,7 +2,7 @@ import { computed, inject, provide, reactive, ref } from 'vue'
 import { addons } from '../mocks/addons.js'
 import { sessions } from '../mocks/sessions.js'
 import { isSoldOut } from '../utils/capacity.js'
-import { schedulesOverlap } from '../utils/time.js'
+import { groupByUtcDay, schedulesOverlap } from '../utils/time.js'
 
 /** Injection key for the wizard's shared registration state. */
 export const REGISTRATION_KEY = Symbol('registration')
@@ -78,6 +78,12 @@ export function createRegistrationState() {
 
   /** @type {import('vue').Ref<Record<string, {quantity: number, size: string|null}>>} */
   const addonSelections = ref({})
+
+  // Which day and category tab is open is wizard state, not component state: the step components
+  // unmount on every navigation, and a tab that resets drops the user somewhere they did not
+  // choose — most visibly when Step 4's "Edit" link sends them back to a specific add-on.
+  const activeDayKey = ref(groupByUtcDay(sessions)[0]?.dayKey ?? '')
+  const activeAddonCategory = ref(ADDON_CATEGORY.WORKSHOP)
 
   const currentStep = ref(1)
   const submitAttempted = ref(false)
@@ -239,6 +245,8 @@ export function createRegistrationState() {
     ticketTypeId.value = DEFAULT_TICKET_TYPE_ID
     selectedSessionIds.value = []
     addonSelections.value = {}
+    activeDayKey.value = groupByUtcDay(sessions)[0]?.dayKey ?? ''
+    activeAddonCategory.value = ADDON_CATEGORY.WORKSHOP
     currentStep.value = 1
     submitAttempted.value = false
     submissionStatus.value = SUBMISSION_STATUS.IDLE
@@ -303,6 +311,8 @@ export function createRegistrationState() {
     ticketTypeId,
     selectedSessionIds,
     addonSelections,
+    activeDayKey,
+    activeAddonCategory,
     currentStep,
     submitAttempted,
     submissionStatus,
