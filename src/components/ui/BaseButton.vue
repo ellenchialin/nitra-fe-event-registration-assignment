@@ -17,8 +17,6 @@ const props = defineProps({
   loading: { type: Boolean, default: false },
 })
 
-// The design gives the final submit a 48px button in an 80px action bar, against 40px in 72px
-// everywhere else.
 const SIZE_CLASSES = {
   md: 'px-4 py-2.5',
   lg: 'px-6 py-3.5',
@@ -50,9 +48,7 @@ const isInteractive = computed(() => !props.disabled && !props.loading)
       />
     </span>
 
-    <!-- The label holds its place at zero opacity so the button keeps its width while submitting.
-         `invisible` would do the same visually but drops the label from the accessibility tree,
-         leaving the button unnamed at exactly the moment it is describing what it is doing. -->
+    <!-- opacity-0, not `invisible`: the label must keep its width and stay in the a11y tree. -->
     <span class="inline-flex items-center gap-2" :class="{ 'opacity-0': loading }">
       <slot />
     </span>

@@ -21,8 +21,6 @@ const conflictTitles = computed(() => props.conflicts.map((session) => session.t
 const soldOut = computed(() => isSoldOut(props.addon))
 const remaining = computed(() => remainingSpots(props.addon))
 
-// Add-on cards state capacity in text/neutral/quiet rather than the banded colours session cards
-// use — there is no bar here for the colour to belong to. "Sold Out" keeps full contrast.
 const capacityClass = computed(() => {
   if (props.unavailable && !soldOut.value) return 'text-neutral-disabled'
   return soldOut.value ? 'text-neutral' : 'text-neutral-quiet'

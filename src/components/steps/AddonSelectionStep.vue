@@ -43,8 +43,6 @@ const showsMerchandise = computed(() => activeCategory.value === ADDON_CATEGORY.
         :aria-label="$t('step3.selectCategory')"
       />
 
-      <!-- Shipping only concerns merchandise, so the banner stays on that tab rather than
-           following the order across all three. -->
       <ShippingBanner v-if="showsMerchandise && hasMerchandise" />
 
       <template v-if="showsMerchandise">

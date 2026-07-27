@@ -15,11 +15,7 @@ defineEmits(['toggle'])
 
 const { timeRange } = useFormatters()
 
-// The design never draws a sold-out card: it renders the sold-out session's data correctly
-// (red bar, "Sold Out") but styles that card as selected, and applies its greyed treatment to a
-// different session that still has spots. The greyed card — muted surface, muted text, no
-// checkbox — is the only "unavailable" visual on offer, so it is used for the state that
-// actually is unavailable. See PLAN.md section 3.
+// The design never draws a sold-out card; the greyed treatment is borrowed. See PLAN.md §3.
 const soldOut = computed(() => isSoldOut(props.session))
 
 const textClass = computed(() => (soldOut.value ? 'text-neutral-disabled' : null))
@@ -46,7 +42,6 @@ const textClass = computed(() => (soldOut.value ? 'text-neutral-disabled' : null
     <span class="flex items-start justify-between gap-2">
       <TrackBadge :track="session.track" :muted="soldOut" />
 
-      <!-- The design's unavailable card draws no checkbox at all. -->
       <span
         v-if="!soldOut"
         class="flex size-4 shrink-0 items-center justify-center rounded-xs border transition-colors"

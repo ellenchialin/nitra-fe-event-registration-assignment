@@ -11,8 +11,6 @@ const { t } = useI18n()
 const { attendee, ticketTypeId, hasMerchandise } = useRegistration()
 const { fieldError } = useValidation()
 
-// The label and border react to merchandise immediately; the message comes from the shared rule
-// set, which only reports once the user has attempted to submit.
 const isShippingRequired = computed(() => hasMerchandise.value)
 
 const shippingLabel = computed(() =>

@@ -9,9 +9,7 @@ const props = defineProps({
   type: { type: String, default: 'text' },
   autocomplete: { type: String, default: undefined },
   required: { type: Boolean, default: false },
-  // Draws the heavier border from the design's "Shipping Address — Conditional States" frame,
-  // which marks a requirement that has just changed. A field that is always required does not
-  // use it — otherwise every required input reads as though something about it just changed.
+  // Heavier border for a requirement that has just changed, not for one that always applied.
   emphasis: { type: Boolean, default: false },
   errorMessage: { type: String, default: '' },
 })

@@ -5,9 +5,6 @@ import { WORKSHOP_DISCOUNT_PERCENT, usePricing } from '../../composables/usePric
 const { ticketType, ticketCents, addonLines, workshopDiscountCents, totalCents } = usePricing()
 
 const { currency } = useFormatters()
-
-// The discount is Figma's text/brand/emphasis (#264D4F), which the starter holds in teal-700 —
-// its own --text-brand-emphasis is a step darker at #1E3C3E.
 </script>
 
 <template>
@@ -33,6 +30,7 @@ const { currency } = useFormatters()
       <span class="shrink-0 text-neutral">{{ currency(line.subtotalCents) }}</span>
     </div>
 
+    <!-- #264D4F lives in teal-700; text-brand-emphasis is a step darker. -->
     <div
       v-if="workshopDiscountCents"
       class="flex items-baseline justify-between gap-4 text-[11px] leading-[14px] text-teal-700"

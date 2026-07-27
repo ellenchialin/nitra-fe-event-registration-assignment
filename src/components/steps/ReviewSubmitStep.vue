@@ -20,10 +20,6 @@ const { ticketType, ticketCents, addonLines, workshopDiscountCents, totalCents }
 const { currency, priceShort, dayAndTime } = useFormatters()
 const { t } = useI18n()
 
-// The two review frames disagree on which attendee rows appear, and one rule reconciles them: a
-// row is shown when it carries a value, or when it is required. Job Title is absent from the error
-// frame because it is optional and empty; Shipping Address appears there only because merchandise
-// makes it required. See PLAN.md section 3.
 const ATTENDEE_FIELDS = [
   { key: 'fullName', required: () => true },
   { key: 'email', required: () => true },
@@ -39,8 +35,6 @@ const attendeeRows = computed(() => {
     key: field.key,
     label: t(`step4.fields.${field.key}`),
     value: attendee[field.key].trim() || t('step4.requiredPlaceholder'),
-    // The placeholder states a fact and always shows; only its danger colour waits for a submit
-    // attempt, so the review never turns red before the user has asked for it.
     missing: !attendee[field.key].trim() && submitAttempted.value,
   }))
 
@@ -69,8 +63,6 @@ const attendeeRows = computed(() => {
   return rows
 })
 
-// A section turns red when its own step is failing, which is what makes the banner's list
-// actionable without every bullet needing to be a link of its own.
 const erroredSteps = computed(() => new Set(props.visibleErrors.map((error) => error.step)))
 
 const errorBanner = ref(null)

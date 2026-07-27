@@ -63,10 +63,8 @@ export const breakpoints = {
   desktop: '1024px',
 }
 
-// Entry motion for the success screen. Declared as CSS animations rather than Vue transitions:
-// these run from the element's own mount, so nothing depends on requestAnimationFrame, which a
-// backgrounded tab suspends. The check's resting state is fully drawn, so a reduced-motion user
-// who never gets the animation still sees a complete tick.
+// CSS animations, not Vue transitions: these need no requestAnimationFrame, which a backgrounded
+// tab suspends. Every resting state is the finished one, so reduced motion loses nothing.
 export const animation = {
   keyframes: {
     'badge-pop': '{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}',
@@ -79,7 +77,6 @@ export const animation = {
     'check-draw': '520ms',
   },
   timingFns: {
-    // The badge lands with a real overshoot; the stroke itself stays honest and eases out.
     'badge-pop': 'cubic-bezier(0.34, 1.56, 0.64, 1)',
     'badge-ring': 'cubic-bezier(0.16, 1, 0.3, 1)',
     'check-draw': 'cubic-bezier(0.65, 0, 0.35, 1)',

@@ -12,8 +12,7 @@ defineProps({
   >
     <p class="text-sm font-semibold">{{ $t('errors.title') }}</p>
 
-    <!-- The bullet is drawn as text to match the design's spacing, so the list marker is off; a
-         marker as well would render two. Jumping to a step is the section's Edit link's job. -->
+    <!-- Bullet is text, so the list marker is off — both would render two. -->
     <ul class="flex list-none flex-col gap-2">
       <li v-for="(error, index) in errors" :key="`${error.field}-${index}`" class="text-sm">
         &bull; {{ $t('errors.item', { step: error.step, message: error.message }) }}

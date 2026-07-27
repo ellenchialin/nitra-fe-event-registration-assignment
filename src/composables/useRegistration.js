@@ -30,7 +30,6 @@ export const VIP_TICKET_TYPE_ID = 'vip'
 // so the prefix follows the data rather than the mockup.
 const CONFIRMATION_PREFIX = 'WDS2028'
 
-// Long enough to make the loading state visible, short enough not to feel broken.
 const SUBMIT_LATENCY_MS = 900
 
 /**

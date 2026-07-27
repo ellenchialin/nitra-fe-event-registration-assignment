@@ -19,9 +19,7 @@ const BAR_CLASSES = {
   [CAPACITY_BAND.FULL]: 'bg-danger-emphasis-rest',
 }
 
-// Figma fills these labels with orange/700 and text/brand/emphasis (#A13B02, #264D4F). Neither
-// value exists in the starter's semantic text scale — its --text-brand-emphasis is #1E3C3E — so
-// these use palette utilities, which are still theme-backed rather than literal hex.
+// #A13B02 and #264D4F have no semantic text token; these palette utilities hold them.
 const LABEL_CLASSES = {
   [CAPACITY_BAND.LOW]: 'text-teal-700',
   [CAPACITY_BAND.MEDIUM]: 'text-warning-default',

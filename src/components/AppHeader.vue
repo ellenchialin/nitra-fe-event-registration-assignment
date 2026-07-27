@@ -5,11 +5,8 @@ import LocaleSwitcher from './ui/LocaleSwitcher.vue'
 </script>
 
 <template>
-  <!-- The design's 48px padding holds wherever there is room for it. Below that the header tracks
-       the content column's own gutter — `(100% - 1200px) / 2`, floored at the 24px page gutter —
-       so the two stay aligned. No single breakpoint does this: between 1248px and 1296px the
-       column's gutter slides from 24 to 48, and a fixed padding would drift against it. The
-       percentage resolves against the containing block rather than `100vw`, so a classic
+  <!-- Tracks the content column's gutter, capped at the design's 48px. A breakpoint cannot do
+       this: between 1248px and 1296px the gutter slides from 24 to 48. `100%` not `100vw`, so a
        scrollbar cannot skew it. -->
   <header
     class="flex items-center gap-3 border-b divider-default bg-surface-l0 py-4 px-[clamp(24px,calc((100%-1200px)/2),48px)]"

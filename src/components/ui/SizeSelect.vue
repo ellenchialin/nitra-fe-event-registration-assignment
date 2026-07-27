@@ -22,7 +22,6 @@ const size = defineModel({ type: String, default: '' })
         <option v-for="option in sizes" :key="option" :value="option">{{ option }}</option>
       </select>
 
-      <!-- The design draws a solid caret glyph, not a stroked chevron. -->
       <svg
         viewBox="0 0 6 4"
         class="pointer-events-none absolute right-3 top-1/2 w-1.5 -translate-y-1/2 text-neutral-quiet"

@@ -16,8 +16,7 @@ defineEmits(['edit'])
     <div class="flex items-start justify-between gap-4">
       <h3 class="text-subtitle1" :class="invalid ? 'text-danger' : 'text-neutral'">{{ title }}</h3>
 
-      <!-- Figma's components/button/primary-link/text/rest is #3A7679, which the starter holds in
-           teal-500 — its text/brand/default is a step darker at #2E5E60. -->
+      <!-- #3A7679 lives in teal-500; text-brand is a step darker. -->
       <button
         type="button"
         class="shrink-0 text-sm font-semibold text-teal-500 underline transition-colors hover:text-brand"
