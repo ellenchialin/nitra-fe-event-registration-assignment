@@ -15,7 +15,7 @@ const RANGE_SEPARATOR = ' – '
  * @returns {number} Epoch milliseconds, or `NaN` if the input is absent or unparseable.
  */
 export function toEpochMs(isoTimestamp) {
-  if (!isoTimestamp) return NaN
+  if (!isoTimestamp) return Number.NaN
   return new Date(isoTimestamp).getTime()
 }
 
