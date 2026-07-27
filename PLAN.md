@@ -27,7 +27,7 @@ not cosmetic.
 | 4     | Step 3 — category tabs, workshop conflicts, size/qty, shipping banner, order summary | 1.5h | ✅ Done       |
 | 5     | Step 4 — review cards, unified validation, error navigation, submit + success        | 1h   | ✅ Done       |
 | 6     | Polish — responsive layout, interactive states, entry motion                         | 1h   | ✅ Done       |
-| 7     | i18n pass + this document                                                            | 1h   | ▢ Not started |
+| 7     | i18n pass, dead-code sweep, CSS duplication audit                                    | 1h   | ✅ Done       |
 | 8     | Acceptance pass — scenarios below, clean-checkout smoke test                         | 0.5h | ▢ Not started |
 
 Design fidelity is 20% of the rubric, so Phase 0 was deliberately front-loaded: guessing at spacing
@@ -314,6 +314,36 @@ avoid Quasar dimming the spinner via `[disabled] { opacity: .6 !important }` —
 attribute blocks mouse, keyboard and programmatic activation for free, and a dimmed busy button is
 the conventional look. And an `aria-disabled` alongside it, which merely restates what the native
 attribute already exposes.
+
+**Phase 7 — i18n pass and cleanup**
+
+_Dead code removed._ `conflictsFor` and `conflictingPairs` in `useSessions` had no consumers —
+Step 4's conflict check went through `overlappingPairs` in `utils/time.js` instead, so a second
+parallel conflict API was sitting there implying Step 2 flags conflicts, which was explicitly
+decided against. `hasFieldError` in `useValidation` was superseded by `fieldError` and never
+called. Both found by the branch review rather than by reading.
+
+_i18n audited by script, not by eye._ Locale parity holds at 102 keys with no drift in either
+direction. Two orphans removed: `fields.shippingAddress.requiredForMerchandise`, stranded when
+Phase 5 moved that message into the rule set, and `fields.shippingAddress.label`, unreachable
+because the field always resolves to `labelOptional` or `labelRequired`. Placeholder sets and
+plural branch counts were compared across locales; the only flag was `step2.selectedCount`, where
+English hardcodes "1 session" in its singular branch while Chinese interpolates — both correct, and
+both carrying the three branches Vue I18n's default rule requires.
+
+_The zh-TW success line was rewritten._ It read `您的 VIP 票 WebDev Summit 2028 報名已確認`, which
+runs two noun phrases together without a particle. Now `您報名的 {event}（{ticket} 票）已確認`.
+Parity checks prove a key exists, not that it reads well, so this part needed reading rather than
+scripting.
+
+_CSS duplication audit._ No duplicate keys in any shortcut map and no repeated custom properties in
+the SCSS. It did surface something the notes had wrong, though: CLAUDE.md claimed the three colour
+classes were "the only three collisions" with Quasar. They are not — `.text-h1` through `.text-h6`,
+`.text-subtitle1` and `.text-subtitle2` are all defined twice. Ours win, because unlike the colour
+classes Quasar declares typography without `!important` and the UnoCSS sheet loads later. Verified
+rather than assumed: `text-subtitle1` renders 16/20 at weight 610, not Quasar's 16/28 at 400. No
+fix needed, but the claim was false and is now corrected, with the caveat that a dynamically-built
+typography class would fall through to Quasar's much larger scale.
 
 ---
 

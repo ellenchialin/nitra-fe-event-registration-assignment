@@ -56,8 +56,14 @@ specification.
   `text/info/default`, matching the CSS variables. The bare names are shorthand, and Quasar
   defines those three itself with `!important`, so the shorthand silently renders Quasar's
   palette (`text-warning` gives `#FADD00`, not the design's `#918108`). These are the only three
-  collisions: every other semantic shortcut carries a suffix Quasar does not define, and its
+  colour collisions: every other semantic shortcut carries a suffix Quasar does not define, and its
   palette stops at `-14`.
+- **The typography shortcuts collide too, but resolve our way.** Quasar also defines `.text-h1`
+  through `.text-h6`, `.text-subtitle1` and `.text-subtitle2`. Unlike the three colour classes it
+  declares these _without_ `!important`, and the UnoCSS sheet loads later, so ours win on cascade
+  order alone — verified: `text-subtitle1` renders 16/20 at weight 610, not Quasar's 16/28 at 400.
+  Nothing to fix, but do not reorder the stylesheets, and be aware a typography class built
+  dynamically (which UnoCSS cannot scan) would fall through to Quasar's much larger scale.
 - **Translate Figma tokens by value, never by name.** The brand ramp is shifted one step between
   the two: Figma's `bg/brand/muted/rest` is `#EEF6F7`, but the starter's `--bg-brand-muted-rest`
   is `#CBE5E6` — `#EEF6F7` lives in `bg-brand-subtle-rest`. `text/brand/default` and
