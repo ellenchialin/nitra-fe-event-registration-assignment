@@ -40,14 +40,21 @@ const isInteractive = computed(() => !props.disabled && !props.loading)
     :type="type"
     :disabled="!isInteractive"
     :aria-busy="loading || undefined"
-    class="inline-flex min-w-[72px] items-center justify-center gap-2 rounded text-[14px] leading-5 font-semibold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50"
+    class="relative inline-flex min-w-[72px] items-center justify-center rounded text-[14px] leading-5 font-semibold transition-colors duration-150 disabled:cursor-not-allowed"
     :class="[variantClasses, SIZE_CLASSES[size]]"
   >
-    <span
-      v-if="loading"
-      class="size-4 animate-spin rounded-full border-2 border-current border-t-transparent"
-      aria-hidden="true"
-    />
-    <slot />
+    <span v-if="loading" class="absolute inset-0 flex items-center justify-center">
+      <span
+        class="size-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+        aria-hidden="true"
+      />
+    </span>
+
+    <!-- The label holds its place at zero opacity so the button keeps its width while submitting.
+         `invisible` would do the same visually but drops the label from the accessibility tree,
+         leaving the button unnamed at exactly the moment it is describing what it is doing. -->
+    <span class="inline-flex items-center gap-2" :class="{ 'opacity-0': loading }">
+      <slot />
+    </span>
   </button>
 </template>
