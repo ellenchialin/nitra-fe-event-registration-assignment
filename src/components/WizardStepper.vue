@@ -92,11 +92,12 @@ const LABEL_CLASSES = {
           <template v-else>{{ step.number }}</template>
         </span>
 
-        <!-- Decorative: the button's aria-label already carries label and status. Hidden below
-             tablet because four labels plus connectors do not fit a phone. -->
+        <!-- Decorative: the button's aria-label already carries label and status. `lt-tablet:hidden`
+             rather than `hidden tablet:inline` — Quasar declares `.hidden` with `!important`, which
+             wins at every width and would keep the label permanently invisible. -->
         <span
           aria-hidden="true"
-          class="hidden text-[13px] transition-colors duration-200 tablet:inline"
+          class="text-[13px] transition-colors duration-200 lt-tablet:hidden"
           :class="LABEL_CLASSES[step.status]"
         >
           {{ $t(`steps.${step.key}`) }}

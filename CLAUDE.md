@@ -74,6 +74,11 @@ specification.
   still theme-backed, and honest about the value. Do not snap to the nearest semantic token.
 - **Inter Variable must be loaded.** The starter ships no webfont; the design's weight tokens
   (630/610/570/485) are meaningless without it.
+- **Never use `hidden`.** Quasar declares `.hidden { display: none !important }`, which beats any
+  responsive utility, so `hidden tablet:inline` stays invisible at every width. Use `lt-tablet:hidden`
+  and friends — a class name Quasar does not define. Audited: of Quasar's 625 `!important` utility
+  classes, three overlap this app's markup — `hidden`, `block` and `overflow-hidden` — and only
+  `hidden` does harm, since the other two happen to declare what we already want.
 - **Quasar's `.flex` sets `flex-wrap: wrap`**, UnoCSS's sets `display` only, so before the
   preflight in `uno.config.js` every `flex` in this app wrapped. That preflight restores
   `flex-wrap: nowrap` for `.flex`; do not remove it, and keep using `flex-wrap` where wrapping is
