@@ -115,11 +115,9 @@ export default {
     company: { label: 'Company', placeholder: 'Enter your company name' },
     jobTitle: { label: 'Job Title', placeholder: 'Enter your job title' },
     shippingAddress: {
-      label: 'Shipping Address',
       labelOptional: 'Shipping Address (Optional)',
       labelRequired: 'Shipping Address *',
       placeholder: 'Enter your shipping address',
-      requiredForMerchandise: 'Shipping address is required for merchandise orders',
     },
   },
   nav: {

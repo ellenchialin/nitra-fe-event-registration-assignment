@@ -91,7 +91,7 @@ export default {
   success: {
     title: '報名完成！',
     confirmation: '確認編號 #{code}',
-    body: '{name} 您好，您的 {ticket} 票 {event} 報名已確認，確認信將寄送至 {email}。',
+    body: '{name} 您好，您報名的 {event}（{ticket} 票）已確認，確認信將寄送至 {email}。',
     backHome: '回到首頁',
   },
   summary: {
@@ -118,11 +118,9 @@ export default {
     company: { label: '公司', placeholder: '請輸入公司名稱' },
     jobTitle: { label: '職稱', placeholder: '請輸入職稱' },
     shippingAddress: {
-      label: '寄送地址',
       labelOptional: '寄送地址（選填）',
       labelRequired: '寄送地址 *',
       placeholder: '請輸入寄送地址',
-      requiredForMerchandise: '訂購周邊商品時必須填寫寄送地址',
     },
   },
   nav: {
