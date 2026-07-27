@@ -131,18 +131,6 @@ export function useValidation({ registration } = {}) {
 
   const erroredSteps = computed(() => [...new Set(visibleErrors.value.map((e) => e.step))].sort())
 
-  const erroredFields = computed(() => new Set(visibleErrors.value.map((e) => e.field)))
-
-  /**
-   * Reports whether a field is currently failing a visible rule.
-   *
-   * @param {string} field - Field name used by the rule set.
-   * @returns {boolean} `true` when the field has an error the user should see.
-   */
-  function hasFieldError(field) {
-    return erroredFields.value.has(field)
-  }
-
   /**
    * The message a field is currently failing on.
    *
@@ -171,7 +159,6 @@ export function useValidation({ registration } = {}) {
     isValid,
     visibleErrors,
     erroredSteps,
-    hasFieldError,
     fieldError,
     conflictingSessionIds,
   }
