@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" role="img" aria-label="WebDev Summit">
+  <!-- Same geometry as the header logo (Figma 1116:1010): a 40x40 tile at 8px radius with the
+       28x14.02 emblem centred on it. A static asset cannot read CSS variables, so the fill is the
+       literal value of the brand emphasis token in src/css/colors.scss. Keep double hyphens out of
+       this comment: SVG is XML, and they make the whole document fail to parse. -->
+  <rect width="40" height="40" rx="8" fill="#264d4f" />
+  <g transform="translate(6 12.9886) scale(0.056)" fill="#fff">
+    <path
+      d="M249.979 250.408C48.7573 249.828 113.47 125.368 0 125.207V0C172.152 0.25058 125.745 125.024 249.979 125.201V250.403V250.408Z"
+      transform="translate(125.01 0)"
+    />
+    <rect x="374.99" y="0" width="125.01" height="125.201" />
+    <rect x="0" y="125.207" width="125.01" height="125.201" />
+  </g>
+</svg>
