@@ -65,7 +65,7 @@ const textClass = computed(() => (soldOut.value ? 'text-neutral-disabled' : null
 
     <span class="text-subtitle1" :class="textClass ?? 'text-neutral'">{{ session.title }}</span>
 
-    <span class="text-[12px] leading-4" :class="textClass ?? 'text-neutral-muted'">
+    <span class="text-sm leading-4" :class="textClass ?? 'text-neutral-muted'">
       {{ session.speaker }}, {{ session.speakerTitle }}
     </span>
 

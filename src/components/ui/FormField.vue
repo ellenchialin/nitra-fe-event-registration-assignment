@@ -28,7 +28,7 @@ const borderClass = computed(() => {
   <div class="flex flex-col gap-1.5">
     <label
       :for="fieldId"
-      class="text-[12px] font-medium"
+      class="text-sm font-medium"
       :class="hasError ? 'text-danger' : 'text-neutral'"
     >
       {{ label }}

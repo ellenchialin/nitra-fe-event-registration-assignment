@@ -20,7 +20,10 @@ const { conflictingSessionIds } = useValidation()
 const { dayLabel } = useFormatters()
 
 const dayTabs = computed(() =>
-  dayGroups.value.map((group) => ({ value: group.dayKey, label: dayLabel(group.date) })),
+  dayGroups.value.map((group) => ({
+    value: group.dayKey,
+    label: dayLabel(group.date),
+  })),
 )
 </script>
 
@@ -30,7 +33,7 @@ const dayTabs = computed(() =>
 
     <SegmentedTabs v-model="activeDayKey" :tabs="dayTabs" :aria-label="$t('step2.selectDay')" />
 
-    <p class="text-[12px] leading-4 font-medium text-brand">
+    <p class="text-sm leading-4 font-medium text-brand">
       {{ $t('step2.selectedCount', selectedSessionIds.length) }}
     </p>
 

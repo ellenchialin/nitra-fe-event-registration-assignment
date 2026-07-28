@@ -28,11 +28,11 @@ const { priceShort } = useFormatters()
       <span>{{ priceShort(toCents(ticket.price)) }}</span>
     </span>
 
-    <span class="text-[12px] leading-4 text-neutral-muted">{{ ticket.description }}</span>
+    <span class="text-sm leading-4 text-neutral-muted">{{ ticket.description }}</span>
 
     <span v-for="perk in ticket.perks" :key="perk" class="flex w-full items-center gap-2">
       <CircleCheckIcon class="size-3.5 shrink-0 text-neutral" />
-      <span class="text-[12px] leading-4 text-neutral-muted">{{ perk }}</span>
+      <span class="text-sm leading-4 text-neutral-muted">{{ perk }}</span>
     </span>
 
     <!-- Always laid out, hidden until selected: adding it on selection would change the card's
