@@ -6,8 +6,6 @@ export default function () {
 
     css: ['app.scss'],
 
-    extras: ['material-icons'],
-
     build: {
       target: {
         browser: ['es2022', 'firefox115', 'chrome115', 'safari14'],

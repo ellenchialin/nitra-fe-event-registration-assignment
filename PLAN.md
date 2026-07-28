@@ -867,11 +867,28 @@ obvious next candidate — it was the last native dropdown in the app, and a ful
 menu, right-aligned under itself, 48px from the header edge on desktop and 24px on mobile, with the
 header still measuring 73px.
 
-The icon is an inlined SVG rather than `<q-icon name="translate">`. `extras: ['material-icons']` is
-configured in `quasar.config.js` and its CSS is fetched on every load, but the app renders no glyphs
-from it, so the woff2 itself never is — reaching for `QIcon` here would have pulled a ~100KB webfont
-for a single symbol. Inlining matches what `BrandMark` and `CircleCheckIcon` already do, and takes
-`currentColor`. **That config entry is now dead weight and should be dropped.**
+The icon is an inlined SVG rather than `<q-icon name="translate">`. Inlining matches what
+`BrandMark` and `CircleCheckIcon` already do, and takes `currentColor`.
+
+_And the config entry it made redundant._ With no `QIcon` anywhere, the starter's
+`extras: ['material-icons']` was declaring a dependency nothing used, so it is now removed. My first
+pass at costing this was wrong in the way this document keeps recording: I checked the dev server's
+network tab, saw one small CSS request, and called it negligible without ever looking at a
+production build. The build tells a different story — Quasar bundles both font files regardless of
+whether a glyph is rendered:
+
+|                      | Before                      | After     |
+| -------------------- | --------------------------- | --------- |
+| `dist/spa`           | 1.0 MB                      | 776 KB    |
+| Material Icons fonts | 287 KB (`.woff` + `.woff2`) | none      |
+| Built CSS            | 201,160 B                   | 200,579 B |
+
+The honest reading of that table is that the headline 248 KB is **artifact size, not transfer size**.
+Browsers fetch a font file only when a glyph uses it, and this app renders none, so real visitors
+were almost certainly never downloading it — the per-visitor saving is the 581 bytes of CSS. The
+reason to remove it is not performance but that a quarter of the deploy artifact was dead weight the
+config asked for and the app never wanted. Verified after removal: both `QSelect` popups still open
+and render every option, and the inlined SVG chevrons are unaffected.
 
 One pre-existing gap this surfaced, unrelated to the swap: nothing ever updated `<html lang>`.
 Quasar's Lang plugin does `el.setAttribute('lang', lang.isoName)` from its default `en-US` pack and
